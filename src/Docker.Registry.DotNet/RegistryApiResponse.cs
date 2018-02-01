@@ -1,21 +1,28 @@
-﻿using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
+using System.Net.Http.Headers;
 
 namespace Docker.Registry.DotNet
 {
-    internal class RegistryApiResponse
+    internal abstract class RegistryApiResponse
     {
-        public RegistryApiResponse(HttpStatusCode statusCode, string body, KeyValuePair<string, string[]>[] headers)
+        protected RegistryApiResponse(HttpStatusCode statusCode, HttpResponseHeaders headers)
         {
             StatusCode = statusCode;
-            Body = body;
             Headers = headers;
         }
 
         public HttpStatusCode StatusCode { get; }
 
-        public string Body { get; }
+        public HttpResponseHeaders Headers { get; }
+    }
 
-        public KeyValuePair<string, string[]>[] Headers { get; }
+    internal class RegistryApiResponse<TBody> : RegistryApiResponse
+    {
+        internal RegistryApiResponse(HttpStatusCode statusCode, TBody body, HttpResponseHeaders headers) : base(statusCode, headers)
+        {
+            Body = body;
+        }
+
+        public TBody Body { get; }
     }
 }

@@ -6,7 +6,7 @@ namespace Docker.Registry.DotNet.Authentication
     /// <summary>
     /// Authentication provider.
     /// </summary>
-    public abstract class AuthenticationProvider
+    internal abstract class AuthenticationProvider
     {
         /// <summary>
         /// Called on the initial send

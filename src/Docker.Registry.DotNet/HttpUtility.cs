@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 
 namespace Docker.Registry.DotNet
 {
@@ -53,6 +54,33 @@ namespace Docker.Registry.DotNet
                 .Where(h => h.Key == name)
                 .Select(h => h.Value?.FirstOrDefault())
                 .ToArray();
+        }
+
+        public static int? GetContentLength(this HttpResponseHeaders responseHeaders)
+        {
+            if (!responseHeaders.TryGetValues("Content-Length", out IEnumerable<string> values))
+            {
+                return null;
+            }
+
+            string raw = values.FirstOrDefault();
+
+            if (int.TryParse(raw, out int parsed))
+            {
+                return parsed;
+            }
+
+            return null;
+        }
+
+        public static string GetString(this HttpResponseHeaders responseHeaders, string name)
+        {
+            if (!responseHeaders.TryGetValues(name, out IEnumerable<string> values))
+            {
+                return null;
+            }
+
+            return values.FirstOrDefault();
         }
     }
 }

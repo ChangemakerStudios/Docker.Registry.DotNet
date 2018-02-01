@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿using System;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Docker.Registry.DotNet.Models;
 
@@ -13,10 +15,15 @@ namespace Docker.Registry.DotNet.Endpoints
             _client = client;
         }
 
-
-        public Task<GetBlobResponse> GetBlobAsync(string name, string digest, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<GetBlobResponse> GetBlobAsync(string name, string digest, CancellationToken cancellationToken = new CancellationToken())
         {
-            throw new System.NotImplementedException();
+            string url = $"v2/{name}/blobs/{digest}";
+
+            var response = await _client.MakeRequestForStreamedResponseAsync(cancellationToken, HttpMethod.Get, url);
+
+            return new GetBlobResponse(
+                response.Headers.GetString("Docker-Content-Digest"),
+                response.Body);
         }
 
         public Task<BlobHeader> GetBlobHeadAsync(string name, string digest, CancellationToken cancellationToken = new CancellationToken())
@@ -26,7 +33,9 @@ namespace Docker.Registry.DotNet.Endpoints
 
         public Task DeleteBlobAsync(string name, string digest, CancellationToken cancellationToken = new CancellationToken())
         {
-            throw new System.NotImplementedException();
+            string url = $"v2/{name}/blobs/{digest}";
+
+            return _client.MakeRequestAsync(cancellationToken, HttpMethod.Delete, url);
         }
     }
 }

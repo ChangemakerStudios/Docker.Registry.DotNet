@@ -1,23 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
+using System.Net.Http.Headers;
 
 namespace Docker.Registry.DotNet
 {
     public class RegistryApiException : Exception
     {
         internal RegistryApiException(RegistryApiResponse response)
-            : base($"Docker API responded with status code={response.StatusCode}, response={response.Body}")
+            : base($"Docker API responded with status code={response.StatusCode}")
         {
             StatusCode = response.StatusCode;
-            ResponseBody = response.Body;
             Headers = response.Headers;
         }
 
         public HttpStatusCode StatusCode { get; }
 
-        public string ResponseBody { get; }
-
-        public KeyValuePair<string, string[]>[] Headers { get; }
+        public HttpResponseHeaders Headers { get; }
     }
 }

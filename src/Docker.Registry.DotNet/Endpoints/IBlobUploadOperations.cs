@@ -16,7 +16,7 @@ namespace Docker.Registry.DotNet.Endpoints
         /// <param name="digest"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<InitiateMonolithicUploadResponse> UploadBlobAsync(string name, int contentLength, Stream stream, string digest, CancellationToken cancellationToken = new CancellationToken());
+        Task UploadBlobAsync(string name, int contentLength, Stream stream, string digest, CancellationToken cancellationToken = new CancellationToken());
 
         /// <summary>
         /// Initiate a resumable blob upload. If successful, an upload location will be provided to complete the upload. Optionally, if the digest parameter is present, the request body will be used to complete the upload in a single request.

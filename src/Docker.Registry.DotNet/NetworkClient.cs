@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Docker.Registry.DotNet.Authentication;
+using Docker.Registry.DotNet.Models;
 
 namespace Docker.Registry.DotNet
 {
@@ -42,29 +44,42 @@ namespace Docker.Registry.DotNet
             JsonSerializer = new JsonSerializer();
         }
 
-        internal async Task<RegistryApiResponse> MakeRequestAsync(
+        internal async Task<RegistryApiResponse<string>> MakeRequestAsync(
             CancellationToken cancellationToken,
             HttpMethod method,
             string path,
             IQueryString queryString = null,
             IDictionary<string, string> headers = null,
-            HttpContent content = null)
+            Func<HttpContent> content = null)
         {
             using (var response = await InternalMakeRequestAsync(DefaultTimeout,
                 HttpCompletionOption.ResponseContentRead, method, path, queryString, headers, content, cancellationToken))
             {
                 var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-                var responseHeaders =
-                    response.Headers.Select(h => new KeyValuePair<string, string[]>(h.Key, h.Value.ToArray()))
-                        .ToArray();
-
-                var apiResponse = new RegistryApiResponse(response.StatusCode, responseBody, responseHeaders);
+                var apiResponse = new RegistryApiResponse<string>(response.StatusCode, responseBody, response.Headers);
 
                 HandleIfErrorResponse(apiResponse);
 
                 return apiResponse;
             }
+        }
+
+        internal async Task<RegistryApiResponse<Stream>> MakeRequestForStreamedResponseAsync(
+            CancellationToken cancellationToken,
+            HttpMethod method,
+            string path,
+            IQueryString queryString = null)
+        {
+            var response = await InternalMakeRequestAsync(s_InfiniteTimeout, HttpCompletionOption.ResponseHeadersRead, method, path, queryString, null, null, cancellationToken);
+
+            var body = await response.Content.ReadAsStreamAsync();
+
+            var apiResponse = new RegistryApiResponse<Stream>(response.StatusCode, body, response.Headers);
+
+            HandleIfErrorResponse(apiResponse);
+
+            return apiResponse;
         }
 
         private async Task<HttpResponseMessage> InternalMakeRequestAsync(
@@ -74,7 +89,7 @@ namespace Docker.Registry.DotNet
             string path,
             IQueryString queryString,
             IDictionary<string, string> headers,
-            HttpContent content,
+            Func<HttpContent> content,
             CancellationToken cancellationToken)
         {
             var request = PrepareRequest(method, path, queryString, headers, content);
@@ -120,7 +135,7 @@ namespace Docker.Registry.DotNet
             }
         }
 
-        internal HttpRequestMessage PrepareRequest(HttpMethod method, string path, IQueryString queryString, IDictionary<string, string> headers, HttpContent content)
+        internal HttpRequestMessage PrepareRequest(HttpMethod method, string path, IQueryString queryString, IDictionary<string, string> headers, Func<HttpContent> content)
         {
             if (string.IsNullOrEmpty("path"))
             {
@@ -139,7 +154,8 @@ namespace Docker.Registry.DotNet
                 }
             }
 
-            request.Content = content;
+            //Create the content
+            request.Content = content();
            
             return request;
         }

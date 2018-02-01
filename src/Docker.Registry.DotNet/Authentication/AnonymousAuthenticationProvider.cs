@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Docker.Registry.DotNet.Authentication
 {
-    public class AnonymousAuthenticationProvider : AuthenticationProvider
+    internal class AnonymousAuthenticationProvider : AuthenticationProvider
     {
         internal override Task AuthenticateAsync(HttpRequestMessage request)
         {

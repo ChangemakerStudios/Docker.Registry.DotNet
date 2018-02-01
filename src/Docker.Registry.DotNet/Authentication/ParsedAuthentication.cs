@@ -1,6 +1,6 @@
 ﻿namespace Docker.Registry.DotNet.Authentication
 {
-    public class ParsedAuthentication
+    internal class ParsedAuthentication
     {
         public string Realm { get; }
 

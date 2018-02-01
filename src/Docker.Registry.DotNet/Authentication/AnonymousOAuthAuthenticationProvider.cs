@@ -7,7 +7,7 @@ using Docker.Registry.DotNet.OAuth;
 
 namespace Docker.Registry.DotNet.Authentication
 {
-    public class AnonymousOAuthAuthenticationProvider : AuthenticationProvider
+    internal class AnonymousOAuthAuthenticationProvider : AuthenticationProvider
     {
         private readonly OAuthClient _client = new OAuthClient();
 

@@ -26,7 +26,6 @@ namespace Docker.Registry.DotNet.Endpoints
 
             queryString.AddIfNotNull("n", parameters.Number);
 
-
             var response = await _client.MakeRequestAsync(cancellationToken, HttpMethod.Get, $"v2/{name}/tags/list", queryString).ConfigureAwait(false);
             return _client.JsonSerializer.DeserializeObject<ListImageTagsResponse>(response.Body);
         }

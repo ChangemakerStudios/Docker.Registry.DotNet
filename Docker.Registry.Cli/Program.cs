@@ -1,4 +1,7 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Docker.Registry.DotNet;
 using Docker.Registry.DotNet.Authentication;
@@ -29,26 +32,86 @@ namespace Docker.Registry.Cli
 
         private static async Task TestAsync()
         {
-            string url = "https://registry-1.docker.io/";
-            //string url = "http://10.0.4.44:5000/";
+            //string url = "https://registry-1.docker.io/";
+            string url = "http://10.0.4.44:5000/";
 
             var configuration = new RegistryClientConfiguration(new Uri(url));
 
             using (var client = configuration.CreateClient(new AnonymousOAuthAuthenticationProvider()))
             {
-                //Console.WriteLine("Ping...");
 
-                //var tags = await client.Tags.ListImageTagsAsync("resin", new ListImageTagsParameters());
+                var bytes = File.ReadAllBytes(@"c:\layer.txt");
 
-                //foreach (var tag in tags.Tags)
+                string sha256Hash;
+
+                using (var sha = SHA256.Create())
+                {
+                    var hash = sha.ComputeHash(bytes);
+
+                    sha256Hash = $"sha256:{string.Join("", hash.Select(b => b.ToString("x")))}";
+                }
+
+                using (var source = File.OpenRead(@"c:\layer.txt"))
+                {
+                    await client.BlobUploads.UploadBlobAsync("my-repo", (int)source.Length, source, sha256Hash);
+                }
+
+                ////Console.WriteLine("Ping...");
+
+                ////var tags = await client.Tags.ListImageTagsAsync("resin", new ListImageTagsParameters());
+
+                ////foreach (var tag in tags.Tags)
+                ////{
+                ////    Console.WriteLine();
+                ////}
+
+                //var catalog = await client.Catalog.GetCatalogAsync(new CatalogParameters()
                 //{
-                //    Console.WriteLine();
+                //    Number = 10
+                //});
+
+                //var repository = catalog.Repositories.FirstOrDefault();
+
+                //if (string.IsNullOrWhiteSpace(repository))
+                //{
+                //    Console.WriteLine("No repository found.");
+                //}
+                //else
+                //{
+                //    var tagsReponse =  await client.Tags.ListImageTagsAsync(repository, new ListImageTagsParameters());
+
+                //    var tag = tagsReponse.Tags.FirstOrDefault();
+
+                //    if (string.IsNullOrWhiteSpace(tag))
+                //    {
+                //        Console.WriteLine("No tags found.");
+                //    }
+                //    else
+                //    {
+                //        var manifestResult = await client.Manifests.GetManifestAsync(repository, tag);
+
+                //        Console.WriteLine(manifestResult.Manifest.GetType().Name);
+
+                //        var imageManifest = manifestResult.Manifest as ImageManifest2_1;
+
+                //        if (imageManifest != null)
+                //        {
+                //            var layer = imageManifest.FsLayers.First();
+
+                //            var getBlobResponse = await client.Blobs.GetBlobAsync(repository, layer.BlobSum);
+
+                //            Console.WriteLine($"\t\tDigetst: {getBlobResponse.DockerContentDigest}");
+
+                //            using (getBlobResponse.Stream)
+                //            using (Stream targetStream = File.OpenWrite(@"c:\test.layer"))
+                //            {
+                //                await getBlobResponse.Stream.CopyToAsync(targetStream);
+                //            }   
+                //        }
+                //    }
+
                 //}
 
-                var catalog = await client.Catalog.GetCatalogAsync(new CatalogParameters()
-                {
-                    Number = 10
-                });
             }
         }
     }

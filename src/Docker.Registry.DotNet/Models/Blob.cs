@@ -4,8 +4,8 @@ namespace Docker.Registry.DotNet.Models
 {
     public class GetBlobResponse : BlobHeader
     {
-        internal GetBlobResponse(int contentLength, string dockerContentDigest, Stream stream) 
-            : base(contentLength, dockerContentDigest)
+        internal GetBlobResponse(string dockerContentDigest, Stream stream) 
+            : base(dockerContentDigest)
         {
             Stream = stream;
         }
@@ -16,13 +16,10 @@ namespace Docker.Registry.DotNet.Models
     public class BlobHeader
     {
 
-        internal BlobHeader(int contentLength, string dockerContentDigest)
+        internal BlobHeader(string dockerContentDigest)
         {
-            ContentLength = contentLength;
             DockerContentDigest = dockerContentDigest;
         }
-
-        public int ContentLength { get; }
 
         public string DockerContentDigest { get; }
     }
