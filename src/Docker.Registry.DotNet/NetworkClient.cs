@@ -155,7 +155,7 @@ namespace Docker.Registry.DotNet
             }
 
             //Create the content
-            request.Content = content();
+            request.Content = content?.Invoke();
            
             return request;
         }

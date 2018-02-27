@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2026
+VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Docker.Registry.DotNet", "src\Docker.Registry.DotNet\Docker.Registry.DotNet.csproj", "{4E407B44-8D47-4C72-AC8E-6FCB9DBF7CC9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Docker.Registry.Cli", "Docker.Registry.Cli\Docker.Registry.Cli.csproj", "{DB73F6A9-7ACC-4C26-BC8C-E8BA68CBBA8E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Docker.Registry.Cli", "Docker.Registry.Cli\Docker.Registry.Cli.csproj", "{DB73F6A9-7ACC-4C26-BC8C-E8BA68CBBA8E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DockerRegistryExplorer", "DockerRegistryExplorer\DockerRegistryExplorer.csproj", "{513C7B92-BFAF-4E0A-B8D9-FC0E7283CD62}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{DB73F6A9-7ACC-4C26-BC8C-E8BA68CBBA8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB73F6A9-7ACC-4C26-BC8C-E8BA68CBBA8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB73F6A9-7ACC-4C26-BC8C-E8BA68CBBA8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{513C7B92-BFAF-4E0A-B8D9-FC0E7283CD62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{513C7B92-BFAF-4E0A-B8D9-FC0E7283CD62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{513C7B92-BFAF-4E0A-B8D9-FC0E7283CD62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{513C7B92-BFAF-4E0A-B8D9-FC0E7283CD62}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

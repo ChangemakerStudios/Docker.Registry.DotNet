@@ -37,24 +37,24 @@ namespace Docker.Registry.Cli
 
             var configuration = new RegistryClientConfiguration(new Uri(url));
 
-            using (var client = configuration.CreateClient(new AnonymousOAuthAuthenticationProvider()))
+            using (var client = configuration.CreateClient())
             {
 
-                var bytes = File.ReadAllBytes(@"c:\layer.txt");
+                //var bytes = File.ReadAllBytes(@"c:\layer.txt");
 
-                string sha256Hash;
+                //string sha256Hash;
 
-                using (var sha = SHA256.Create())
-                {
-                    var hash = sha.ComputeHash(bytes);
+                //using (var sha = SHA256.Create())
+                //{
+                //    var hash = sha.ComputeHash(bytes);
 
-                    sha256Hash = $"sha256:{string.Join("", hash.Select(b => b.ToString("x")))}";
-                }
+                //    sha256Hash = $"sha256:{string.Join("", hash.Select(b => b.ToString("x")))}";
+                //}
 
-                using (var source = File.OpenRead(@"c:\layer.txt"))
-                {
-                    await client.BlobUploads.UploadBlobAsync("my-repo", (int)source.Length, source, sha256Hash);
-                }
+                //using (var source = File.OpenRead(@"c:\layer.txt"))
+                //{
+                //    await client.BlobUploads.UploadBlobAsync("my-repo", (int)source.Length, source, sha256Hash);
+                //}
 
                 ////Console.WriteLine("Ping...");
 
@@ -65,12 +65,26 @@ namespace Docker.Registry.Cli
                 ////    Console.WriteLine();
                 ////}
 
-                //var catalog = await client.Catalog.GetCatalogAsync(new CatalogParameters()
-                //{
-                //    Number = 10
-                //});
+                var catalog = await client.Catalog.GetCatalogAsync(new CatalogParameters()
+                {
+                    Number = 10
+                });
 
-                //var repository = catalog.Repositories.FirstOrDefault();
+                var repositories = catalog.Repositories;
+
+                foreach (var repository in repositories)
+                {
+                    Console.WriteLine("-----------------------------------------------");
+                    Console.WriteLine(repository);
+                    Console.WriteLine("-----------------------------------------------");
+
+                    var tags = await client.Tags.ListImageTagsAsync(repository, new ListImageTagsParameters());
+
+                    foreach (var tag in tags.Tags)
+                    {
+                        Console.WriteLine($"  {tag}");
+                    }
+                }
 
                 //if (string.IsNullOrWhiteSpace(repository))
                 //{
