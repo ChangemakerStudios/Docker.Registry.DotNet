@@ -7,6 +7,7 @@
     using Autofac;
     using Cas.Common.WPF.Interfaces;
     using Docker.Registry.DotNet;
+    using Docker.Registry.DotNet.Authentication;
     using GalaSoft.MvvmLight;
     using GalaSoft.MvvmLight.CommandWpf;
 
@@ -15,13 +16,15 @@
         private readonly ILifetimeScope _lifetimeScope;
         private readonly IMessageBoxService _messageBoxService;
         private readonly ITextEditService _textEditService;
+        private readonly IViewService _viewService;
         private readonly ObservableCollection<RegistryViewModel> _registries = new ObservableCollection<RegistryViewModel>();
 
-        public MainViewModel(ILifetimeScope lifetimeScope, IMessageBoxService messageBoxService, ITextEditService textEditService)
+        public MainViewModel(ILifetimeScope lifetimeScope, IMessageBoxService messageBoxService, ITextEditService textEditService, IViewService viewService)
         {
             _lifetimeScope = lifetimeScope;
             _messageBoxService = messageBoxService;
             _textEditService = textEditService;
+            _viewService = viewService ?? throw new ArgumentNullException(nameof(viewService));
 
             RefreshCommand = new RelayCommand(Refresh);
             ConnectCommand = new RelayCommand(Connect);
@@ -34,36 +37,23 @@
 
         private void Connect()
         {
-            try
+            var viewModel = _lifetimeScope.Resolve<ConnectViewModel>();
+
+            if (_viewService.ShowDialog(viewModel) == true)
             {
-                string endpoint = null;
+                var registryClient = viewModel.RegistryClient;
 
-                _textEditService.EditText("http://10.0.4.44:5000/", "Docker Registry Endpoint", "Add Registry Endpoint", s => endpoint = s);
-
-                if (!string.IsNullOrEmpty(endpoint))
+                var childScope = _lifetimeScope.BeginLifetimeScope(builder =>
                 {
-                    var configuration = new RegistryClientConfiguration(new Uri(endpoint));
+                    builder.RegisterInstance(registryClient);
+                });
 
-                    var registryClient = configuration.CreateClient();
+                var registry = childScope.Resolve<RegistryViewModel>
+                (
+                    new NamedParameter("url", viewModel.Endpoint)
+                );
 
-                    //await registryClient.System.PingAsync();
-
-                    var childScope = _lifetimeScope.BeginLifetimeScope(builder =>
-                        {
-                            builder.RegisterInstance(registryClient);
-                        });
-
-                    var registry = childScope.Resolve<RegistryViewModel>
-                        (
-                            new NamedParameter("url", endpoint)
-                        );
-
-                    _registries.Add(registry);
-                }
-            }
-            catch (Exception ex)
-            {
-                _messageBoxService.Show(ex.Message, "Error");
+                _registries.Add(registry);
             }
         }
 

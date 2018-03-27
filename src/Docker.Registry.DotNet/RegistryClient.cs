@@ -22,6 +22,7 @@ namespace Docker.Registry.DotNet
             Catalog = new CatalogOperations(_client);
             Blobs = new BlobOperations(_client);
             BlobUploads = new BlobUploadOperations(_client);
+            System = new SystemOperations(_client);
             Tags = new TagOperations(_client);
         }
 
@@ -34,6 +35,8 @@ namespace Docker.Registry.DotNet
         public IBlobUploadOperations BlobUploads { get; }
 
         public ITagOperations Tags { get; }
+
+        public ISystemOperations System { get; }
 
         public async Task PingAsync(CancellationToken cancellationToken = new CancellationToken())
         {

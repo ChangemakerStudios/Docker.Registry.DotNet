@@ -66,6 +66,7 @@
 
                     Repositories = new ObservableCollection<RepositoryViewModel>(repositories);
 
+                    Console.WriteLine("Done");
 
                 }).IgnoreAsync();
             }

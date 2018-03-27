@@ -46,13 +46,11 @@ namespace Docker.Registry.DotNet.Endpoints
 
             //await GetBlobUploadStatus(name, uuid, cancellationToken);
 
-            
-
             try
             {
                 using (var client = new HttpClient())
                 {
-                    var progressResponse = await client.GetAsync(location, cancellationToken);
+                    HttpResponseMessage progressResponse = await client.GetAsync(location, cancellationToken);
 
                     //Send the contents of the whole file
                     var content = new StreamContent(stream);
@@ -73,7 +71,7 @@ namespace Docker.Registry.DotNet.Endpoints
                         throw new RegistryApiException(new RegistryApiResponse<string>(response2.StatusCode, null, response.Headers));
                     }
 
-                   progressResponse = await client.GetAsync(location, cancellationToken);
+                    progressResponse = await client.GetAsync(location, cancellationToken);
                 }
 
                 ////{

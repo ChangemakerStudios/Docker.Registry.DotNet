@@ -1,4 +1,4 @@
-﻿<Window x:Class="DockerRegistryExplorer.MainWindow"
+﻿<Window x:Class="DockerRegistryExplorer.View.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -78,7 +78,7 @@
             <MenuItem Header="_File">
                 <MenuItem Header="_Connect..." Command="{Binding Path=ConnectCommand}"/>
                 <Separator/>
-                <MenuItem Header="E_xit"/>
+                <MenuItem Header="E_xit" Click="MenuItem_OnClick" />
             </MenuItem>
             <MenuItem Header="_View">
                 <MenuItem Header="Refresh" InputGestureText="F5" Command="{Binding Path=RefreshCommand}"></MenuItem>

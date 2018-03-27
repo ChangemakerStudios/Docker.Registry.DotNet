@@ -17,6 +17,8 @@ namespace Docker.Registry.DotNet
 
         ITagOperations Tags { get; }
 
+        ISystemOperations System { get; }
+
         Task PingAsync(CancellationToken cancellationToken = new CancellationToken());
 
     }

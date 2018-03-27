@@ -6,7 +6,7 @@ using Docker.Registry.DotNet.OAuth;
 
 namespace Docker.Registry.DotNet.Authentication
 {
-    internal class PasswordOAuthAuthenticationProvider : AuthenticationProvider
+    public class PasswordOAuthAuthenticationProvider : AuthenticationProvider
     {
         private readonly string _username;
         private readonly string _password;

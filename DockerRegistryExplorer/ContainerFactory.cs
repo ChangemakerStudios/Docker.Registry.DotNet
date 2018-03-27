@@ -3,6 +3,7 @@
     using Autofac;
     using Cas.Common.WPF;
     using Cas.Common.WPF.Interfaces;
+    using View;
     using ViewModel;
 
     public static class ContainerFactory
@@ -10,10 +11,10 @@
         public static IContainer Build()
         {
             var builder = new ContainerBuilder();
-
             
             //view service registrations
-            builder.RegisterViewModel<MainViewModel, MainWindow>();
+            builder.RegisterViewModel<MainViewModel, View.MainWindow>();
+            builder.RegisterViewModel<ConnectViewModel, ConnectView>();
 
             //view models
             builder.RegisterType<RegistryViewModel>();

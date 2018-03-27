@@ -7,7 +7,7 @@ using Docker.Registry.DotNet.OAuth;
 
 namespace Docker.Registry.DotNet.Authentication
 {
-    internal class AnonymousOAuthAuthenticationProvider : AuthenticationProvider
+    public class AnonymousOAuthAuthenticationProvider : AuthenticationProvider
     {
         private readonly OAuthClient _client = new OAuthClient();
 
@@ -25,10 +25,8 @@ namespace Docker.Registry.DotNet.Authentication
                     //Get the bearer bits
                     var bearerBits = AuthenticateParser.ParseTyped(header.Parameter);
 
-                    string scope = bearerBits.Scope;
-                    
                     //Get the token
-                    var token = await _client.GetTokenAsync(bearerBits.Realm, bearerBits.Service, scope);
+                    var token = await _client.GetTokenAsync(bearerBits.Realm, bearerBits.Service, bearerBits.Scope);
 
                     var tokenHandler = new JwtSecurityTokenHandler();
 
