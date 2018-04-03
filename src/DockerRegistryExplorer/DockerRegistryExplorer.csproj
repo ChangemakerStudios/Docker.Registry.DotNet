@@ -148,7 +148,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\Docker.Registry.DotNet\Docker.Registry.DotNet.csproj">
+    <ProjectReference Include="..\Docker.Registry.DotNet\Docker.Registry.DotNet.csproj">
       <Project>{4e407b44-8d47-4c72-ac8e-6fcb9dbf7cc9}</Project>
       <Name>Docker.Registry.DotNet</Name>
     </ProjectReference>

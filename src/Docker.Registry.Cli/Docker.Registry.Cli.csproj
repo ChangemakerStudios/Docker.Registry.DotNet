@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\Docker.Registry.DotNet\Docker.Registry.DotNet.csproj" />
+    <ProjectReference Include="..\Docker.Registry.DotNet\Docker.Registry.DotNet.csproj" />
   </ItemGroup>
 
 </Project>

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Docker.Registry.DotNet", "src\Docker.Registry.DotNet\Docker.Registry.DotNet.csproj", "{4E407B44-8D47-4C72-AC8E-6FCB9DBF7CC9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Docker.Registry.DotNet", "Docker.Registry.DotNet\Docker.Registry.DotNet.csproj", "{4E407B44-8D47-4C72-AC8E-6FCB9DBF7CC9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Docker.Registry.Cli", "Docker.Registry.Cli\Docker.Registry.Cli.csproj", "{DB73F6A9-7ACC-4C26-BC8C-E8BA68CBBA8E}"
 EndProject
