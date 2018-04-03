@@ -18,7 +18,7 @@ namespace Docker.Registry.DotNet
 
             _client = new NetworkClient(configuration, authenticationProvider);
 
-            Manifests = new ManifestOperations(_client);
+            Manifest = new ManifestOperations(_client);
             Catalog = new CatalogOperations(_client);
             Blobs = new BlobOperations(_client);
             BlobUploads = new BlobUploadOperations(_client);
@@ -26,7 +26,7 @@ namespace Docker.Registry.DotNet
             Tags = new TagOperations(_client);
         }
 
-        public IManifestOperations Manifests { get; }
+        public IManifestOperations Manifest { get; }
 
         public ICatalogOperations Catalog { get; }
 

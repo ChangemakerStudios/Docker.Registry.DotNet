@@ -29,7 +29,7 @@ namespace Docker.Registry.DotNet
 
         public IRegistryClient CreateClient()
         {
-            return new RegistryClient(this, new AnonymousAuthenticationProvider());
+            return new RegistryClient(this, new AnonymousOAuthAuthenticationProvider());
         }
 
         public IRegistryClient CreateClient(AuthenticationProvider authenticationProvider)

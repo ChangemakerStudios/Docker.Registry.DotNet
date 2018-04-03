@@ -37,7 +37,7 @@
 
                 var client = configuration.CreateClient(authenticationProvider);
 
-                await client.PingAsync();
+                await client.System.PingAsync();
 
                 RegistryClient = client;
             });

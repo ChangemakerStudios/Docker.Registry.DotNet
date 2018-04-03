@@ -53,7 +53,7 @@ namespace Docker.Registry.Cli
 
                 using (var source = File.OpenRead(@"c:\layer.txt"))
                 {
-                    await client.BlobUploads.UploadBlobAsync("my-repo", (int)source.Length, source, sha256Hash);
+                   // await client.BlobUploads.UploadBlobAsync("my-repo", (int)source.Length, source, sha256Hash);
                 }
 
                 ////Console.WriteLine("Ping...");
@@ -102,7 +102,7 @@ namespace Docker.Registry.Cli
                 //    }
                 //    else
                 //    {
-                //        var manifestResult = await client.Manifests.GetManifestAsync(repository, tag);
+                //        var manifestResult = await client.Manifest.GetManifestAsync(repository, tag);
 
                 //        Console.WriteLine(manifestResult.Manifest.GetType().Name);
 
