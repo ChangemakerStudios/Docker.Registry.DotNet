@@ -2,9 +2,10 @@
 {
     public class GetImageManifestResult
     {
-        internal GetImageManifestResult(string mediaType, ImageManifest manifest) 
+        internal GetImageManifestResult(string mediaType, ImageManifest manifest, string content) 
         {
             Manifest = manifest;
+            Content = content;
             MediaType = mediaType;
         }
 
@@ -18,5 +19,10 @@
         /// The image manifest
         /// </summary>
         public ImageManifest Manifest { get; }
+
+        /// <summary>
+        /// Gets the original, raw body returned from the server.
+        /// </summary>
+        public string Content { get; }
     }
 }

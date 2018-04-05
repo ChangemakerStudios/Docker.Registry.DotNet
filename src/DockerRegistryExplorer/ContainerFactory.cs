@@ -13,14 +13,16 @@
             var builder = new ContainerBuilder();
             
             //view service registrations
-            builder.RegisterViewModel<MainViewModel, View.MainWindow>();
+            builder.RegisterViewModel<MainViewModel, MainWindow>();
             builder.RegisterViewModel<ConnectViewModel, ConnectView>();
+            builder.RegisterViewModel<TextDialogViewModel, TextDialogView>();
 
             //view models
             builder.RegisterType<RegistryViewModel>();
             builder.RegisterType<RepositoriesViewModel>();
             builder.RegisterType<RepositoryViewModel>();
             builder.RegisterType<TagViewModel>();
+            builder.RegisterType<TextDialogViewModel>();
 
             //Services
             builder.RegisterType<MessageBoxService>().As<IMessageBoxService>().SingleInstance();

@@ -48,6 +48,7 @@
                     Tags = tags.Tags
                         .Select(t => _lifetimeScope.Resolve<TagViewModel>
                         (
+                            new NamedParameter("repository", Name),
                             new NamedParameter("tag", t)
                         ))
                         //.OrderBy(t => t.Tag)

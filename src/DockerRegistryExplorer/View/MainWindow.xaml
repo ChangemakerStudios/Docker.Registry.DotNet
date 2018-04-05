@@ -53,7 +53,14 @@
         
         <!-- Tag -->
         <DataTemplate DataType="{x:Type viewModel:TagViewModel}">
-            <TextBlock Text="{Binding Path=Tag}"></TextBlock>
+            <Grid>
+                <Grid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Get Manifest..." Command="{Binding Path=GetManifestCommand}"/>
+                    </ContextMenu>
+                </Grid.ContextMenu>
+                <TextBlock Text="{Binding Path=Tag}"></TextBlock>
+            </Grid>
         </DataTemplate>
 
     </Window.Resources>

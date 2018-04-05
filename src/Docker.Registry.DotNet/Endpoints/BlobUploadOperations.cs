@@ -145,7 +145,7 @@ namespace Docker.Registry.DotNet.Endpoints
             throw new System.NotImplementedException();
         }
 
-        public async Task<BlobUploadStatus> GetBlobUploadStatus(string name, string uuid, CancellationToken cancellationToken = new CancellationToken())
+        public Task<BlobUploadStatus> GetBlobUploadStatus(string name, string uuid, CancellationToken cancellationToken = new CancellationToken())
         {
             
             throw new NotImplementedException();
