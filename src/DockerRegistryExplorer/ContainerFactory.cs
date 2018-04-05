@@ -16,6 +16,7 @@
             builder.RegisterViewModel<MainViewModel, MainWindow>();
             builder.RegisterViewModel<ConnectViewModel, ConnectView>();
             builder.RegisterViewModel<TextDialogViewModel, TextDialogView>();
+            builder.RegisterViewModel<ManifestDialogViewModel, ManfiestDialogView>();
 
             //view models
             builder.RegisterType<RegistryViewModel>();
@@ -23,6 +24,8 @@
             builder.RegisterType<RepositoryViewModel>();
             builder.RegisterType<TagViewModel>();
             builder.RegisterType<TextDialogViewModel>();
+            builder.RegisterType<ManifestDialogViewModel>();
+            builder.RegisterType<ManifestLayerViewModel>();
 
             //Services
             builder.RegisterType<MessageBoxService>().As<IMessageBoxService>().SingleInstance();

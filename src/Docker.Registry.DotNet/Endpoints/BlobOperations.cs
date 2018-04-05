@@ -26,11 +26,6 @@ namespace Docker.Registry.DotNet.Endpoints
                 response.Body);
         }
 
-        public Task<BlobHeader> GetBlobHeadAsync(string name, string digest, CancellationToken cancellationToken = new CancellationToken())
-        {
-            throw new System.NotImplementedException();
-        }
-
         public Task DeleteBlobAsync(string name, string digest, CancellationToken cancellationToken = new CancellationToken())
         {
             string url = $"v2/{name}/blobs/{digest}";

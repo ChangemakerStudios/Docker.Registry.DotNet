@@ -83,6 +83,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ViewModel\ManifestDialogViewModel.cs" />
+    <Compile Include="ViewModel\ManifestLayerViewModel.cs" />
+    <Compile Include="View\ManfiestDialogView.xaml.cs">
+      <DependentUpon>ManfiestDialogView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\TextDialogView.xaml.cs">
       <DependentUpon>TextDialogView.xaml</DependentUpon>
     </Compile>
@@ -126,6 +131,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="View\ManfiestDialogView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\TextDialogView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

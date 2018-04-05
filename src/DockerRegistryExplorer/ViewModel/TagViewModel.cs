@@ -6,10 +6,8 @@
     using Cas.Common.WPF.Interfaces;
     using Docker.Registry.DotNet;
     using Docker.Registry.DotNet.Models;
-    using DockerExplorer.Extensions;
     using GalaSoft.MvvmLight;
     using GalaSoft.MvvmLight.CommandWpf;
-    using Newtonsoft.Json;
 
     public class TagViewModel : ViewModelBase
     {
@@ -34,9 +32,12 @@
             Tag = tag;
 
             GetManifestCommand = new RelayCommand(GetManifest);
+            ViewManifestCommand = new RelayCommand(ViewManifest);
         }
 
         public ICommand GetManifestCommand { get; }
+
+        public ICommand ViewManifestCommand { get; }
 
         public AsyncExecutor Executor { get; } = new AsyncExecutor();
 
@@ -61,6 +62,40 @@
                     );
 
                 _viewService.Show(textDialogViewModel);
+            }
+        }
+
+        private async void ViewManifest()
+        {
+            GetImageManifestResult result = null;
+
+            var ex = await Executor.ExecuteAsync(async () =>
+            {
+                result = await _registryClient.Manifest.GetManifestAsync(Repository, Tag);
+            });
+
+            if (ex != null)
+            {
+                _messageBoxService.Show(ex.Message);
+            }
+            else
+            {
+                var manifest = result.Manifest as ImageManifest2_2;
+
+                if (manifest == null)
+                {
+                    _messageBoxService.Show("Unsupported manifest type.");
+                }
+                else
+                {
+                    var dialogViewModel = _scope.Resolve<ManifestDialogViewModel>
+                    (
+                        new TypedParameter(typeof(ImageManifest2_2), manifest),
+                        new TypedParameter(GetType(), this)
+                    );
+
+                    _viewService.ShowDialog(dialogViewModel);
+                }
             }
         }
 

@@ -1,0 +1,36 @@
+﻿<Window x:Class="DockerRegistryExplorer.View.ManfiestDialogView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DockerRegistryExplorer.View"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:behaviors="clr-namespace:Cas.Common.WPF.Behaviors;assembly=Cas.Common.WPF"
+        xmlns:viewModel="clr-namespace:DockerRegistryExplorer.ViewModel"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance viewModel:ManifestDialogViewModel}"
+        Title="{Binding Path=Title}" Height="450" Width="800">
+
+    <i:Interaction.Behaviors>
+        <behaviors:CloseableBehavior/>
+    </i:Interaction.Behaviors>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        
+        <StackPanel Orientation="Horizontal">
+            <Button Command="{Binding Path=DownloadCommand}" Margin="4" VerticalAlignment="Center" MinWidth="120">Download Layer...</Button>
+        </StackPanel>
+        
+        <DataGrid Grid.Row="1" AutoGenerateColumns="False" ItemsSource="{Binding Path=Layers}" IsReadOnly="True" SelectedItem="{Binding Path=SelectedLayer}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Media Type" Binding="{Binding Path=MediaType, Mode=OneWay}" />
+                <DataGridTextColumn Header="Size" Binding="{Binding Path=Size, Mode=OneWay}"/>
+                <DataGridTextColumn Header="Digest" Binding="{Binding Path=Digest, Mode=OneWay}" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>
