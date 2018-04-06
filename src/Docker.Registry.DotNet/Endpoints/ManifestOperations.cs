@@ -59,6 +59,9 @@ namespace Docker.Registry.DotNet.Endpoints
 
             var check = JsonConvert.DeserializeObject<SchemaCheck>(manifest);
 
+            if (!string.IsNullOrWhiteSpace(check.MediaType))
+                return check.MediaType;
+
             if (check.SchemaVersion == null)
                 return ManifestMediaTypes.ManifestSchema1;
 
@@ -75,6 +78,9 @@ namespace Docker.Registry.DotNet.Endpoints
             /// </summary>
             [DataMember(Name = "schemaVersion")]
             public int? SchemaVersion { get; set; }
+
+            [DataMember(Name = "mediaType")]
+            public string MediaType { get; set; }
         }
 
         public Task PutManifestAsync(string name, string reference, ImageManifest manifest,

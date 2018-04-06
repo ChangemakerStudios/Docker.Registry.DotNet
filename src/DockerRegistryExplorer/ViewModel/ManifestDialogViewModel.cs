@@ -35,12 +35,15 @@
             _manifest = manifest ?? throw new ArgumentNullException(nameof(manifest));
             _parent = parent ?? throw new ArgumentNullException(nameof(parent));
 
-            Layers = manifest.Layers
-                .Select(l => scope.Resolve<ManifestLayerViewModel>
-                (
-                    new TypedParameter(typeof(ManifestLayer), l)
-                ))
-                .ToArray();
+            if (manifest.Layers != null)
+            {
+                Layers = manifest.Layers
+                    .Select(l => scope.Resolve<ManifestLayerViewModel>
+                    (
+                        new TypedParameter(typeof(ManifestLayer), l)
+                    ))
+                    .ToArray();
+            }
 
             DownloadCommand = new RelayCommand(Download, CanDownload);
         }

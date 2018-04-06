@@ -51,7 +51,7 @@
                             new NamedParameter("repository", Name),
                             new NamedParameter("tag", t)
                         ))
-                        //.OrderBy(t => t.Tag)
+                        .OrderByDescending(t => t.Tag)
                         .ToArray();
 
                 }).IgnoreAsync();

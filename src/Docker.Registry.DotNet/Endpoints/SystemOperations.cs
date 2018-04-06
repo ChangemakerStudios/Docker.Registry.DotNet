@@ -15,7 +15,7 @@
 
         public Task PingAsync(CancellationToken cancellationToken = new CancellationToken())
         {
-            return _client.MakeRequestAsync(cancellationToken, HttpMethod.Get, "v2");
+            return _client.MakeRequestAsync(cancellationToken, HttpMethod.Get, "v2/");
         }
     }
 }

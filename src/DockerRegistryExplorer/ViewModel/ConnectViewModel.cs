@@ -6,7 +6,6 @@
 
     public class ConnectViewModel : DialogViewModelBase
     {
-        //private const string DefaultEndpoint = "http://hubcontrol.captiveaire.com:5000/";
         private const string DefaultEndpoint = "https://registry-1.docker.io/";
 
         private bool _isAnonymous = true;

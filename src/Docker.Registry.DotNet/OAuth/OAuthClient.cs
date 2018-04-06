@@ -20,7 +20,11 @@ namespace Docker.Registry.DotNet.OAuth
             var queryString = new QueryString();
 
             queryString.AddIfNotEmpty("service", service);
-            queryString.AddIfNotEmpty("scope", scope);
+
+            //if (!string.IsNullOrEmpty(scope))
+            //{
+                queryString.AddIfNotEmpty("scope", scope);
+            //}
 
             UriBuilder builder = new UriBuilder(new Uri(realm))
             {
