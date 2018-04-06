@@ -32,17 +32,8 @@ namespace Docker.Registry.DotNet.Authentication
                     //Get the bearer bits
                     var bearerBits = AuthenticateParser.ParseTyped(header.Parameter);
 
-                    string scope = bearerBits.Scope;
-
-                    //if (scope == "registry:catalog:*")
-                    //{
-                    //    scope = "registry:catalog:get";
-                    //}
-
                     //Get the token
-                    var token = await _client.GetTokenAsync(bearerBits.Realm, bearerBits.Service, scope, _username, _password);
-
-                    //Console.WriteLine(token.AccessToken);
+                    var token = await _client.GetTokenAsync(bearerBits.Realm, bearerBits.Service, bearerBits.Scope, _username, _password);
 
                     //Set the header
                     request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token.Token);

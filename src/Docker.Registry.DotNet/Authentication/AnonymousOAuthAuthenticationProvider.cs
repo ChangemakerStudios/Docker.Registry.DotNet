@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -27,15 +26,6 @@ namespace Docker.Registry.DotNet.Authentication
 
                     //Get the token
                     var token = await _client.GetTokenAsync(bearerBits.Realm, bearerBits.Service, bearerBits.Scope);
-
-                    var tokenHandler = new JwtSecurityTokenHandler();
-
-                    var parsed = tokenHandler.ReadJwtToken(token.AccessToken);
-
-                    foreach (var payloadItem in parsed.Payload)
-                    {
-                        Console.WriteLine($" {payloadItem.Key}: {payloadItem.Value}");
-                    }
 
                     //Set the header
                     request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token.Token);
