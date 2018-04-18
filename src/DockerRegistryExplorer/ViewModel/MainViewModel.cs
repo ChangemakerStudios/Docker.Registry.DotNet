@@ -6,24 +6,18 @@
     using System.Windows.Input;
     using Autofac;
     using Cas.Common.WPF.Interfaces;
-    using Docker.Registry.DotNet;
-    using Docker.Registry.DotNet.Authentication;
     using GalaSoft.MvvmLight;
     using GalaSoft.MvvmLight.CommandWpf;
 
     public class MainViewModel : ViewModelBase
     {
         private readonly ILifetimeScope _lifetimeScope;
-        private readonly IMessageBoxService _messageBoxService;
-        private readonly ITextEditService _textEditService;
         private readonly IViewService _viewService;
         private readonly ObservableCollection<RegistryViewModel> _registries = new ObservableCollection<RegistryViewModel>();
 
-        public MainViewModel(ILifetimeScope lifetimeScope, IMessageBoxService messageBoxService, ITextEditService textEditService, IViewService viewService)
+        public MainViewModel(ILifetimeScope lifetimeScope, IViewService viewService)
         {
             _lifetimeScope = lifetimeScope;
-            _messageBoxService = messageBoxService;
-            _textEditService = textEditService;
             _viewService = viewService ?? throw new ArgumentNullException(nameof(viewService));
 
             RefreshCommand = new RelayCommand(Refresh);

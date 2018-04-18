@@ -58,6 +58,8 @@
                     <ContextMenu>
                         <MenuItem Header="Get Manifest..." Command="{Binding Path=GetManifestCommand}"/>
                         <MenuItem Header="View Manifest..." Command="{Binding Path=ViewManifestCommand}"/>
+                        <Separator/>
+                        <MenuItem Header="Delete..." Command="{Binding Path=DeleteCommand}"></MenuItem>
                     </ContextMenu>
                 </Grid.ContextMenu>
                 <TextBlock Text="{Binding Path=Tag}"></TextBlock>

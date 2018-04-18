@@ -1,6 +1,7 @@
 ﻿namespace DockerRegistryExplorer.ViewModel
 {
     using System;
+    using System.Windows;
     using System.Windows.Input;
     using Autofac;
     using Cas.Common.WPF.Interfaces;
@@ -15,12 +16,14 @@
         private readonly IRegistryClient _registryClient;
         private readonly IMessageBoxService _messageBoxService;
         private readonly IViewService _viewService;
+        private readonly RepositoryViewModel _parent;
 
         public TagViewModel(
             ILifetimeScope scope,
             IRegistryClient registryClient, 
             IMessageBoxService messageBoxService,
             IViewService viewService,
+            RepositoryViewModel parent,
             string repository, 
             string tag)
         {
@@ -28,18 +31,55 @@
             _registryClient = registryClient ?? throw new ArgumentNullException(nameof(registryClient));
             _messageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
             _viewService = viewService ?? throw new ArgumentNullException(nameof(viewService));
+            _parent = parent ?? throw new ArgumentNullException(nameof(parent));
             Repository = repository;
             Tag = tag;
 
             GetManifestCommand = new RelayCommand(GetManifest);
             ViewManifestCommand = new RelayCommand(ViewManifest);
+            DeleteCommand = new RelayCommand(Delete, CanDelete);
         }
 
         public ICommand GetManifestCommand { get; }
-
         public ICommand ViewManifestCommand { get; }
+        public ICommand DeleteCommand { get; }
 
         public AsyncExecutor Executor { get; } = new AsyncExecutor();
+
+        private async void Delete()
+        {
+            if (_messageBoxService.Show($"Delete tag '{Repository}:{Tag}'?", "Delete tag", MessageBoxButton.YesNo) ==
+                MessageBoxResult.Yes)
+            {
+                var ex = await Executor.ExecuteAsync(async () =>
+                    {
+                        //We need to get the digest of the manifest
+                        var manifest = await _registryClient.Manifest.GetManifestAsync(Repository, Tag);
+
+                        string digest = manifest.DockerContentDigest;
+
+                        if (string.IsNullOrWhiteSpace(digest))
+                        {
+                            _messageBoxService.Show("Unable to find digest.");
+                        }
+                        else
+                        {
+                            await _registryClient.Manifest.DeleteManifestAsync(Repository, digest);    
+                        }
+                    });
+
+                if (ex == null)
+                {
+                    //Refresh
+                    _parent.Refresh();
+                }
+            }
+        }
+
+        private bool CanDelete()
+        {
+            return !Executor.IsBusy;
+        }
 
         private async void GetManifest()
         {
@@ -52,7 +92,7 @@
 
             if (ex != null)
             {
-                _messageBoxService.Show(ex.Message);
+                _messageBoxService.Show(ex.Message, "Get manifest");
             }
             else
             {

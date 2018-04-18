@@ -42,7 +42,10 @@ namespace Docker.Registry.DotNet.Endpoints
                     };
 
                 case ManifestMediaTypes.ManifestSchema2:
-                    return new GetImageManifestResult(contentType, _client.JsonSerializer.DeserializeObject<ImageManifest2_2>(response.Body), response.Body);
+                    return new GetImageManifestResult(contentType, _client.JsonSerializer.DeserializeObject<ImageManifest2_2>(response.Body), response.Body)
+                    {
+                        DockerContentDigest = response.GetHeader("Docker-Content-Digest"),
+                    };
 
                 case ManifestMediaTypes.ManifestList:
                     return new GetImageManifestResult(contentType, _client.JsonSerializer.DeserializeObject<ManifestList>(response.Body), response.Body);
@@ -83,23 +86,23 @@ namespace Docker.Registry.DotNet.Endpoints
             public string MediaType { get; set; }
         }
 
-        public Task PutManifestAsync(string name, string reference, ImageManifest manifest,
-            CancellationToken cancellationToken = new CancellationToken())
-        {
-            throw new NotImplementedException();
-        }
+        //public Task PutManifestAsync(string name, string reference, ImageManifest manifest,
+        //    CancellationToken cancellationToken = new CancellationToken())
+        //{
+        //    throw new NotImplementedException();
+        //}
 
-        public Task<bool> DoesManifestExistAsync(string name, string reference, CancellationToken cancellation = new CancellationToken())
-        {
-            throw new NotImplementedException();
-        }
+        //public Task<bool> DoesManifestExistAsync(string name, string reference, CancellationToken cancellation = new CancellationToken())
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         public async Task DeleteManifestAsync(string name, string reference,
-            CancellationToken cannCancellationToken = new CancellationToken())
+            CancellationToken cancellationToken = new CancellationToken())
         {
-            string path = $"v2/{name}/manfiests/{reference}";
+            string path = $"v2/{name}/manifests/{reference}";
 
-            await _client.MakeRequestAsync(cannCancellationToken, HttpMethod.Delete, path);
+            await _client.MakeRequestAsync(cancellationToken, HttpMethod.Delete, path);
         }
 
         public async Task<string> GetManifestRawAsync(string name, string reference, CancellationToken cancellationToken)

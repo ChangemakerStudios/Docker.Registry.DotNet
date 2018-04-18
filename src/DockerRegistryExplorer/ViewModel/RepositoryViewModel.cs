@@ -49,7 +49,8 @@
                         .Select(t => _lifetimeScope.Resolve<TagViewModel>
                         (
                             new NamedParameter("repository", Name),
-                            new NamedParameter("tag", t)
+                            new NamedParameter("tag", t),
+                            new TypedParameter(GetType(), this)
                         ))
                         .OrderByDescending(t => t.Tag)
                         .ToArray();

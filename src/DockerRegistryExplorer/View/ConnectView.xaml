@@ -15,6 +15,7 @@
              ResizeMode="NoResize"
              SizeToContent="Height"
              WindowStartupLocation="CenterOwner"
+             Title="Connect"
              d:DataContext="{d:DesignInstance viewModel:ConnectViewModel}"
              Width="400">
 
