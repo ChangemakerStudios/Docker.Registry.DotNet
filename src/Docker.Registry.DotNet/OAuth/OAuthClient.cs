@@ -42,6 +42,9 @@ namespace Docker.Registry.DotNet.OAuth
 
             using (var response = await _client.SendAsync(request, cancellationToken))
             {
+                if (!response.IsSuccessStatusCode)
+                    throw new UnauthorizedAccessException("Unable to authenticate..");
+
                 string body = await response.Content.ReadAsStringAsync();
 
                 var token = JsonConvert.DeserializeObject<OAuthToken>(body);
