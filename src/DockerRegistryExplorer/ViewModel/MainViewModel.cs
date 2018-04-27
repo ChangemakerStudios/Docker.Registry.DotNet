@@ -55,7 +55,7 @@
         {
             foreach (var registry in Registries)
             {
-                //TODO: Refresh
+                registry.Refresh();
             }
         }
 

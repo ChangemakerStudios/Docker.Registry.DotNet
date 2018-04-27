@@ -2,11 +2,13 @@
 {
     using System;
     using System.Linq;
+    using System.Windows.Input;
     using Autofac;
     using Docker.Registry.DotNet;
     using Docker.Registry.DotNet.Models;
     using DockerExplorer.Extensions;
     using GalaSoft.MvvmLight;
+    using GalaSoft.MvvmLight.CommandWpf;
 
     public class RepositoryViewModel : ViewModelBase
     {
@@ -21,7 +23,11 @@
             Name = name;
 
             Refresh();
+
+            RefreshCommand = new RelayCommand(Refresh);
         }
+
+        public ICommand RefreshCommand { get; }
 
         public TagViewModel[] Tags
         {

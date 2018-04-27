@@ -27,7 +27,15 @@
         
         <!-- Registry -->
         <HierarchicalDataTemplate DataType="{x:Type viewModel:RegistryViewModel}" ItemsSource="{Binding Path=Children}">
-            <TextBlock Text="{Binding Path=Url}"></TextBlock>
+            <Grid>
+                <Grid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Refresh" Command="{Binding Path=RefreshCommand}"/>
+                    </ContextMenu>
+                </Grid.ContextMenu>
+                <TextBlock Text="{Binding Path=Url}"></TextBlock>
+            </Grid>
+            
         </HierarchicalDataTemplate>
         
         <!-- Repositories -->

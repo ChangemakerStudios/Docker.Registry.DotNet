@@ -16,6 +16,7 @@
              SizeToContent="Height"
              WindowStartupLocation="CenterOwner"
              Title="Connect"
+            Loaded="ConnectView_OnLoaded"
              d:DataContext="{d:DesignInstance viewModel:ConnectViewModel}"
              Width="400">
 
@@ -82,7 +83,7 @@
             </Grid.RowDefinitions>
 
             <TextBlock Grid.Row="0" Grid.Column="0">Endpoint</TextBlock>
-            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=Endpoint, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=Endpoint, UpdateSourceTrigger=PropertyChanged}" x:Name="EndpointTextBox" />
 
             <TextBlock Grid.Row="1" Grid.Column="0">Anonymous?</TextBlock>
             <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding Path=IsAnonymous}"/>
