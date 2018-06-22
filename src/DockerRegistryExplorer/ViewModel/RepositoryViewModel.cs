@@ -51,15 +51,24 @@
                 {
                     var tags = await _registryClient.Tags.ListImageTagsAsync(Name, new ListImageTagsParameters());
 
-                    Tags = tags.Tags
-                        .Select(t => _lifetimeScope.Resolve<TagViewModel>
-                        (
-                            new NamedParameter("repository", Name),
-                            new NamedParameter("tag", t),
-                            new TypedParameter(GetType(), this)
-                        ))
-                        .OrderByDescending(t => t.Tag)
-                        .ToArray();
+                    if (tags.Tags == null)
+                    {
+                        Tags = new TagViewModel[]{};
+                    }
+                    else
+                    {
+                        Tags = tags.Tags
+                            .Select(t => _lifetimeScope.Resolve<TagViewModel>
+                            (
+                                new NamedParameter("repository", Name),
+                                new NamedParameter("tag", t),
+                                new TypedParameter(GetType(), this)
+                            ))
+                            .OrderByDescending(t => t.Tag)
+                            .ToArray();    
+                    }
+
+                    
 
                 }).IgnoreAsync();
             }
