@@ -6,7 +6,7 @@
 
     public class ConnectViewModel : DialogViewModelBase
     {
-        private const string DefaultEndpoint = "https://registry-1.docker.io/";
+        private const string DefaultEndpoint = "https://docker.io/";
 
         private bool _isAnonymous = true;
         

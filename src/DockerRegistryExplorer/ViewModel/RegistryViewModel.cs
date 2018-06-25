@@ -18,7 +18,8 @@
 
             Children = new ViewModelBase[]
             {
-                lifetimeScope.Resolve<RepositoriesViewModel>()
+                lifetimeScope.Resolve<RepositoriesViewModel>(
+                    new TypedParameter(GetType(), this))
             };
 
             RefreshCommand = new RelayCommand(Refresh);

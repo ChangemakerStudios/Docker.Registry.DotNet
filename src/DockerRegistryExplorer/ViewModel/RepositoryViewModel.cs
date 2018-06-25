@@ -12,12 +12,14 @@
 
     public class RepositoryViewModel : ViewModelBase
     {
+        private readonly RegistryViewModel _parent;
         private readonly IRegistryClient _registryClient;
         private readonly ILifetimeScope _lifetimeScope;
         private TagViewModel[] _tags;
 
-        public RepositoryViewModel(string name, IRegistryClient registryClient, ILifetimeScope lifetimeScope)
+        public RepositoryViewModel(string name, RegistryViewModel parent, IRegistryClient registryClient, ILifetimeScope lifetimeScope)
         {
+            _parent = parent ?? throw new ArgumentNullException(nameof(parent));
             _registryClient = registryClient ?? throw new ArgumentNullException(nameof(registryClient));
             _lifetimeScope = lifetimeScope ?? throw new ArgumentNullException(nameof(lifetimeScope));
             Name = name;
@@ -42,6 +44,11 @@
         public string Name { get; }
 
         public AsyncExecutor Executor { get; } = new AsyncExecutor();
+
+        public RegistryViewModel Parent
+        {
+            get { return _parent; }
+        }
 
         public void Refresh()
         {

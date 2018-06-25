@@ -16,13 +16,15 @@
     public class RepositoriesViewModel : ViewModelBase
     {
         private readonly IRegistryClient _registryClient;
+        private readonly RegistryViewModel _parent;
         private readonly ILifetimeScope _lifetimeScope;
         private readonly ITextEditService _textEditService;
         private ObservableCollection<RepositoryViewModel> _repositories = new ObservableCollection<RepositoryViewModel>();
 
-        public RepositoriesViewModel(IRegistryClient registryClient, ILifetimeScope lifetimeScope, ITextEditService textEditService)
+        public RepositoriesViewModel(IRegistryClient registryClient, RegistryViewModel parent, ILifetimeScope lifetimeScope, ITextEditService textEditService)
         {
             _registryClient = registryClient ?? throw new ArgumentNullException(nameof(registryClient));
+            _parent = parent ?? throw new ArgumentNullException(nameof(parent));
             _lifetimeScope = lifetimeScope ?? throw new ArgumentNullException(nameof(lifetimeScope));
             _textEditService = textEditService ?? throw new ArgumentNullException(nameof(textEditService));
 
@@ -60,7 +62,8 @@
                     var repositories = catalog.Repositories
                         .Select(r => _lifetimeScope.Resolve<RepositoryViewModel>
                         (
-                            new NamedParameter("name", r)
+                            new NamedParameter("name", r),
+                            new TypedParameter(typeof(RegistryViewModel), _parent)
                         ))
                         .OrderBy(e => e.Name);
 
@@ -86,7 +89,8 @@
                     {
                         var repository = _lifetimeScope.Resolve<RepositoryViewModel>
                         (
-                            new NamedParameter("name", name)
+                            new NamedParameter("name", name),
+                            new TypedParameter(typeof(RegistryViewModel), _parent)
                         );
 
                         Repositories.Add(repository);

@@ -1,4 +1,7 @@
-﻿namespace DockerRegistryExplorer.ViewModel
+﻿using System.Runtime.InteropServices;
+using System.Security.Policy;
+
+namespace DockerRegistryExplorer.ViewModel
 {
     using System;
     using System.Windows;
@@ -35,6 +38,7 @@
             Repository = repository;
             Tag = tag;
 
+            CopyTagCommand = new RelayCommand(CopyTag);
             GetManifestCommand = new RelayCommand(GetManifest);
             ViewManifestCommand = new RelayCommand(ViewManifest);
             DeleteCommand = new RelayCommand(Delete, CanDelete);
@@ -44,7 +48,20 @@
         public ICommand ViewManifestCommand { get; }
         public ICommand DeleteCommand { get; }
 
+        public ICommand CopyTagCommand { get; }
+
         public AsyncExecutor Executor { get; } = new AsyncExecutor();
+
+        private void CopyTag()
+        {
+            Uri uri = new Uri(_parent.Parent.Url);
+
+            string hostname = uri.Host;
+
+            string qualified = $"{hostname}/{Repository}:{Tag}";
+
+            Clipboard.SetText(qualified);
+        }
 
         private async void Delete()
         {
