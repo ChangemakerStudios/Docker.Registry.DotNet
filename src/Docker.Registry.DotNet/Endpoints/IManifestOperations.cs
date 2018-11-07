@@ -4,6 +4,9 @@ using Docker.Registry.DotNet.Models;
 
 namespace Docker.Registry.DotNet.Endpoints
 {
+    /// <summary>
+    /// Manifest operations.
+    /// </summary>
     public interface IManifestOperations
     {
         ///// <summary>
