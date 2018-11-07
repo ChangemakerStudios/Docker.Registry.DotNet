@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <IsPackable>true</IsPackable>
@@ -9,12 +9,15 @@
 	  <Description>Docker.DotNet is a library that allows you to interact with the Docker Registry API V2 programmatically with fully asynchronous, non-blocking and object-oriented code in your .NET applications.</Description>
     <TargetFrameworks>net46;netstandard1.6;netstandard2.0</TargetFrameworks>
 	  <PackageTags>Docker Container C# .NET Registry</PackageTags>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <RepositoryType>git</RepositoryType>
     <PackageOutputPath>../../build/packages</PackageOutputPath>
     <IncludeSymbols>False</IncludeSymbols>
+    <NoWarn>1701;1702;1591</NoWarn>
 	<NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.6' ">1.6.1</NetStandardImplicitPackageVersion>
 	<VersionPrefix>1.0.0</VersionPrefix>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.1.0" />

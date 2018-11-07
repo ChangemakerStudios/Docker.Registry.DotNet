@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using Docker.Registry.DotNet.Authentication;
 using Docker.Registry.DotNet.Endpoints;
 
@@ -37,11 +34,6 @@ namespace Docker.Registry.DotNet
         public ITagOperations Tags { get; }
 
         public ISystemOperations System { get; }
-
-        public async Task PingAsync(CancellationToken cancellationToken = new CancellationToken())
-        {
-            await _client.MakeRequestAsync(cancellationToken, HttpMethod.Get, "v2/");
-        }
 
         public void Dispose()
         {

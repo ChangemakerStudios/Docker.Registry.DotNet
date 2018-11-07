@@ -1,5 +1,8 @@
 ﻿namespace Docker.Registry.DotNet.Models
 {
+    /// <summary>
+    /// A resumable upload response.
+    /// </summary>
     public class ResumableUploadResponse
     {
         /// <summary>

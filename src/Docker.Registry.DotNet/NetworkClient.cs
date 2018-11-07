@@ -15,9 +15,11 @@ namespace Docker.Registry.DotNet
         private readonly AuthenticationProvider _authenticationProvider;
         private readonly HttpClient _client;
 
-        private static readonly TimeSpan s_InfiniteTimeout = TimeSpan.FromMilliseconds(Timeout.Infinite);
+        private static readonly TimeSpan InfiniteTimeout = TimeSpan.FromMilliseconds(Timeout.Infinite);
 
         private const string UserAgent = "Docker.Registry.DotNet";
+
+        private Uri _effectiveEndpointBaseUri;
 
         private readonly IEnumerable<Action<RegistryApiResponse>> _errorHandlers = new Action<RegistryApiResponse>[]
         {
@@ -40,6 +42,57 @@ namespace Docker.Registry.DotNet
             DefaultTimeout = configuration.DefaultTimeout;
 
             JsonSerializer = new JsonSerializer();
+
+            if (_configuration.EndpointBaseUri != null)
+            {
+                _effectiveEndpointBaseUri = _configuration.EndpointBaseUri;
+            }
+        }
+
+        /// <summary>
+        /// Ensures that we have configured (and potentially probed) the end point.
+        /// </summary>
+        /// <returns></returns>
+        private async Task EnsureConnection()
+        {
+            if (_effectiveEndpointBaseUri == null)
+            {
+                string httpUrl = $"http://{_configuration.Host}";
+                string httpsUrl = $"https://{_configuration.Host}";
+
+                if (await ProbeSingleAsync(httpsUrl))
+                {
+                    _effectiveEndpointBaseUri = new Uri(httpsUrl);
+                }
+                else if (await ProbeSingleAsync(httpUrl))
+                {
+                    _effectiveEndpointBaseUri = new Uri(httpUrl);
+                }
+                else
+                {
+                    throw new RegistryConnectionException($"Unable to connect to '{_configuration.Host}'");
+                }
+            }
+        }
+
+        async Task<bool> ProbeSingleAsync(string uri)
+        {
+            try
+            {
+                using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
+                using (await _client.SendAsync(request))
+                {
+
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("  " + ex.GetType().Name);
+
+                return false;
+            }
         }
 
         internal async Task<RegistryApiResponse<string>> MakeRequestAsync(
@@ -69,7 +122,7 @@ namespace Docker.Registry.DotNet
             string path,
             IQueryString queryString = null)
         {
-            var response = await InternalMakeRequestAsync(s_InfiniteTimeout, HttpCompletionOption.ResponseHeadersRead, method, path, queryString, null, null, cancellationToken);
+            var response = await InternalMakeRequestAsync(InfiniteTimeout, HttpCompletionOption.ResponseHeadersRead, method, path, queryString, null, null, cancellationToken);
 
             var body = await response.Content.ReadAsStreamAsync();
 
@@ -90,9 +143,11 @@ namespace Docker.Registry.DotNet
             Func<HttpContent> content,
             CancellationToken cancellationToken)
         {
+            await EnsureConnection();
+
             var request = PrepareRequest(method, path, queryString, headers, content);
 
-            if (timeout != s_InfiniteTimeout)
+            if (timeout != InfiniteTimeout)
             {
                 var timeoutTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
                 timeoutTokenSource.CancelAfter(timeout);
@@ -140,7 +195,7 @@ namespace Docker.Registry.DotNet
                 throw new ArgumentNullException(nameof(path));
             }
 
-            var request = new HttpRequestMessage(method, HttpUtility.BuildUri(_configuration.EndpointBaseUri, path, queryString));
+            var request = new HttpRequestMessage(method, HttpUtility.BuildUri(_effectiveEndpointBaseUri, path, queryString));
 
             request.Headers.Add("User-Agent", UserAgent);
 

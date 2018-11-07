@@ -6,7 +6,7 @@
 
     public class ConnectViewModel : DialogViewModelBase
     {
-        private const string DefaultEndpoint = "https://docker.io/";
+        private const string DefaultEndpoint = "registry.hub.docker.com";
 
         private bool _isAnonymous = true;
         
@@ -21,7 +21,7 @@
         {
             var ex = await Executor.ExecuteAsync(async () =>
             {
-                var configuration = new RegistryClientConfiguration(new Uri(Endpoint));
+                var configuration = new RegistryClientConfiguration(Endpoint);
 
                 AuthenticationProvider authenticationProvider;
 
