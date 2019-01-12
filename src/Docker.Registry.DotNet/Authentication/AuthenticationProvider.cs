@@ -13,7 +13,7 @@ namespace Docker.Registry.DotNet.Authentication
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        internal abstract Task AuthenticateAsync(HttpRequestMessage request);
+        protected abstract Task AuthenticateAsync(HttpRequestMessage request);
 
         /// <summary>
         /// Called when the send is challenged.
@@ -21,6 +21,6 @@ namespace Docker.Registry.DotNet.Authentication
         /// <param name="request"></param>
         /// <param name="response"></param>
         /// <returns></returns>
-        internal abstract Task AuthenticateAsync(HttpRequestMessage request, HttpResponseMessage response);
+        protected abstract Task AuthenticateAsync(HttpRequestMessage request, HttpResponseMessage response);
     }
 }
