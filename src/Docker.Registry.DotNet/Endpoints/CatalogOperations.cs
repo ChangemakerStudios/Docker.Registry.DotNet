@@ -24,7 +24,7 @@ namespace Docker.Registry.DotNet.Endpoints
 
             var queryParameters = new QueryString();
 
-            queryParameters.AddIfNotNull("n", parameters.Last);
+            queryParameters.AddIfNotNull("n", parameters.Number);
             queryParameters.AddIfNotNull("last", parameters.Last);
 
             var response = await _client.MakeRequestAsync(cancellationToken, HttpMethod.Get, "v2/_catalog", queryParameters).ConfigureAwait(false);
