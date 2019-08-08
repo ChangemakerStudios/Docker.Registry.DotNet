@@ -18,12 +18,12 @@ namespace Docker.Registry.DotNet.Authentication
             _password = password;
         }
 
-        internal override Task AuthenticateAsync(HttpRequestMessage request)
+        public override Task AuthenticateAsync(HttpRequestMessage request)
         {
             return Task.CompletedTask;
         }
 
-        internal override async Task AuthenticateAsync(HttpRequestMessage request, HttpResponseMessage response)
+        public override async Task AuthenticateAsync(HttpRequestMessage request, HttpResponseMessage response)
         {
             foreach (var header in response.Headers.WwwAuthenticate)
             {
