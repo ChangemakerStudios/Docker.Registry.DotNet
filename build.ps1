@@ -16,22 +16,11 @@ if (Test-Path .\artifacts) {
     Remove-Item .\artifacts -Force -Recurse
 }
 
-& dotnet restore --no-cache
-if ($LASTEXITCODE -ne 0) { exit 1 }    
-
 Write-Output "build: Version is $version"
 
-foreach ($src in ls src/Docker.Registry.DotNet) {
-    Push-Location $src
+& dotnet pack .\src\Docker.Registry.DotNet\Docker.Registry.DotNet.csproj -c Release -o ..\..\artifacts /p:Version="$version"
 
-    Write-Output "build: Packaging project in $src"
-
-    & dotnet pack -c Release -o ..\..\artifacts /p:Version="$version"
-
-    if ($LASTEXITCODE -ne 0) { exit 1 }    
-
-    Pop-Location
-}
+if ($LASTEXITCODE -ne 0) { exit 1 }    
 
 foreach ($test in ls test/*.Tests) {
     Push-Location $test
@@ -39,9 +28,10 @@ foreach ($test in ls test/*.Tests) {
     Write-Output "build: Testing project in $test"
 
     & dotnet test -c Release
-    if ($LASTEXITCODE -ne 0) { exit 3 }
 
     Pop-Location
+
+    if ($LASTEXITCODE -ne 0) { exit 3 }
 }
 
 Pop-Location
