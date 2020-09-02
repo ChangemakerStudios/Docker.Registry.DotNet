@@ -16,6 +16,7 @@
     <PackageId>Docker.Registry.DotNet</PackageId>
     <PackageProjectUrl>https://github.com/ChangemakerStudios/Docker.Registry.DotNet</PackageProjectUrl>
     <RepositoryUrl>https://github.com/ChangemakerStudios/Docker.Registry.DotNet</RepositoryUrl>
+    <PackageReleaseNotes>Added Basic Authentication (thanks Zguy). Fixed issue with operational parameters (thanks lostllama). Fixed issue with large manifest layers (thanks msvprogs).</PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageTags>docker registry .net C# client</PackageTags>    

@@ -21,7 +21,7 @@ if ($LASTEXITCODE -ne 0) { exit 1 }
 
 Write-Output "build: Version is $version"
 
-foreach ($src in ls src/*) {
+foreach ($src in ls src/Docker.Registry.DotNet) {
     Push-Location $src
 
     Write-Output "build: Packaging project in $src"
