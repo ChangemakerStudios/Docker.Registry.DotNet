@@ -20,14 +20,10 @@ Write-Output "build: Version is $version"
 
 if ($LASTEXITCODE -ne 0) { exit 1 }    
 
-foreach ($test in ls test/*.Tests) {
-    Push-Location $test
-
-    Write-Output "build: Testing project in $test"
-
-    & dotnet test -c Release
-
-    Pop-Location
-
-    if ($LASTEXITCODE -ne 0) { exit 3 }
-}
+# foreach ($test in Get-ChildItem test/*.Tests) {
+#     Push-Location $test
+#     Write-Output "build: Testing project in $test"
+#     & dotnet test -c Release
+#     Pop-Location
+#     if ($LASTEXITCODE -ne 0) { exit 3 }
+# }

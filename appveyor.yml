@@ -9,4 +9,4 @@ build_script:
   - cmd: pwsh .\build.ps1 %APPVEYOR_BUILD_VERSION%
 
 after_build:
-  - appveyor PushArtifact artifacts\Docker.Registry.DotNet.%APPVEYOR_BUILD_VERSION%.nupkg
+  - appveyor PushArtifact .\artifacts\Docker.Registry.DotNet.%APPVEYOR_BUILD_VERSION%.nupkg
