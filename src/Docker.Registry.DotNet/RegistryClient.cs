@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Docker.Registry.DotNet.Authentication;
 using Docker.Registry.DotNet.Endpoints;
 
@@ -6,22 +7,26 @@ namespace Docker.Registry.DotNet
 {
     internal sealed class RegistryClient : IRegistryClient
     {
-        private readonly NetworkClient _client;
-
-        public RegistryClient(RegistryClientConfiguration configuration, AuthenticationProvider authenticationProvider) 
+        public RegistryClient(
+            RegistryClientConfiguration configuration,
+            AuthenticationProvider authenticationProvider)
         {
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
-            if (authenticationProvider == null) throw new ArgumentNullException(nameof(authenticationProvider));
 
-            _client = new NetworkClient(configuration, authenticationProvider);
+            if (authenticationProvider == null)
+                throw new ArgumentNullException(nameof(authenticationProvider));
 
-            Manifest = new ManifestOperations(_client);
-            Catalog = new CatalogOperations(_client);
-            Blobs = new BlobOperations(_client);
-            BlobUploads = new BlobUploadOperations(_client);
-            System = new SystemOperations(_client);
-            Tags = new TagOperations(_client);
+            var client = new NetworkClient(configuration, authenticationProvider);
+
+            this.Manifest = new ManifestOperations(client);
+            this.Catalog = new CatalogOperations(client);
+            this.Blobs = new BlobOperations(client);
+            this.BlobUploads = new BlobUploadOperations(client);
+            this.System = new SystemOperations(client);
+            this.Tags = new TagOperations(client);
         }
+
+        public IBlobUploadOperations BlobUploads { get; }
 
         public IManifestOperations Manifest { get; }
 
@@ -29,15 +34,12 @@ namespace Docker.Registry.DotNet
 
         public IBlobOperations Blobs { get; }
 
-        public IBlobUploadOperations BlobUploads { get; }
-
         public ITagOperations Tags { get; }
 
         public ISystemOperations System { get; }
 
         public void Dispose()
         {
-            
         }
     }
 }

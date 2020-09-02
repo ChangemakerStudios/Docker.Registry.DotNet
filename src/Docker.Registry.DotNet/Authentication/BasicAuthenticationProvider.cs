@@ -4,42 +4,44 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
+using JetBrains.Annotations;
+
 namespace Docker.Registry.DotNet.Authentication
 {
+    [PublicAPI]
     public class BasicAuthenticationProvider : AuthenticationProvider
     {
-        private readonly string _username;
         private readonly string _password;
+
+        private readonly string _username;
 
         public BasicAuthenticationProvider(string username, string password)
         {
-            _username = username;
-            _password = password;
+            this._username = username;
+            this._password = password;
         }
+
+        private static string Schema { get; } = "Basic";
 
         public override Task AuthenticateAsync(HttpRequestMessage request)
         {
             return Task.CompletedTask;
         }
 
-        public override Task AuthenticateAsync(HttpRequestMessage request, HttpResponseMessage response)
+        public override Task AuthenticateAsync(
+            HttpRequestMessage request,
+            HttpResponseMessage response)
         {
-            foreach (var header in response.Headers.WwwAuthenticate)
-            {
-                if (header.Scheme == "Basic")
-                {
-                    // Convert password to base64 encoded string
-                    var passBytes = Encoding.UTF8.GetBytes($"{_username}:{_password}");
-                    var base64Pass = Convert.ToBase64String(passBytes);
+            this.TryGetSchemaHeader(response, Schema);
 
-                    //Set the header
-                    request.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64Pass);
+            var passBytes = Encoding.UTF8.GetBytes($"{this._username}:{this._password}");
+            var base64Pass = Convert.ToBase64String(passBytes);
 
-                    return Task.CompletedTask;
-                }
-            }
+            //Set the header
+            request.Headers.Authorization =
+                new AuthenticationHeaderValue(Schema, base64Pass);
 
-            throw new InvalidOperationException("No WWW-Authenticate challenge was found.");
+            return Task.CompletedTask;
         }
     }
 }

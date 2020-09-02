@@ -5,93 +5,100 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Docker.Registry.DotNet.Authentication;
 
 namespace Docker.Registry.DotNet
 {
     internal class NetworkClient : IDisposable
     {
-        private readonly RegistryClientConfiguration _configuration;
+        private const string UserAgent = "Docker.Registry.DotNet";
+
+        private static readonly TimeSpan InfiniteTimeout =
+            TimeSpan.FromMilliseconds(Timeout.Infinite);
+
         private readonly AuthenticationProvider _authenticationProvider;
+
         private readonly HttpClient _client;
 
-        private static readonly TimeSpan InfiniteTimeout = TimeSpan.FromMilliseconds(Timeout.Infinite);
+        private readonly RegistryClientConfiguration _configuration;
 
-        private const string UserAgent = "Docker.Registry.DotNet";
+        private readonly IEnumerable<Action<RegistryApiResponse>> _errorHandlers =
+            new Action<RegistryApiResponse>[]
+            {
+                r =>
+                {
+                    if (r.StatusCode == HttpStatusCode.Unauthorized)
+                        throw new UnauthorizedApiException(r);
+                }
+            };
 
         private Uri _effectiveEndpointBaseUri;
 
-        private readonly IEnumerable<Action<RegistryApiResponse>> _errorHandlers = new Action<RegistryApiResponse>[]
+        public NetworkClient(
+            RegistryClientConfiguration configuration,
+            AuthenticationProvider authenticationProvider)
         {
-            r =>
-            {
-                if (r.StatusCode == HttpStatusCode.Unauthorized)
-                {
-                    throw new UnauthorizedApiException(r);
-                }
-            }
-        };
+            this._configuration =
+                configuration ?? throw new ArgumentNullException(nameof(configuration));
+            this._authenticationProvider = authenticationProvider
+                                           ?? throw new ArgumentNullException(
+                                               nameof(authenticationProvider));
 
-        public NetworkClient(RegistryClientConfiguration configuration, AuthenticationProvider authenticationProvider)
+            this._client = new HttpClient();
+
+            this.DefaultTimeout = configuration.DefaultTimeout;
+
+            this.JsonSerializer = new JsonSerializer();
+
+            if (this._configuration.EndpointBaseUri != null)
+                this._effectiveEndpointBaseUri = this._configuration.EndpointBaseUri;
+        }
+
+        public TimeSpan DefaultTimeout { get; set; }
+
+        public JsonSerializer JsonSerializer { get; }
+
+        public void Dispose()
         {
-            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            _authenticationProvider = authenticationProvider ?? throw new ArgumentNullException(nameof(authenticationProvider));
-
-            _client = new HttpClient();
-
-            DefaultTimeout = configuration.DefaultTimeout;
-
-            JsonSerializer = new JsonSerializer();
-
-            if (_configuration.EndpointBaseUri != null)
-            {
-                _effectiveEndpointBaseUri = _configuration.EndpointBaseUri;
-            }
+            this._client?.Dispose();
         }
 
         /// <summary>
-        /// Ensures that we have configured (and potentially probed) the end point.
+        ///     Ensures that we have configured (and potentially probed) the end point.
         /// </summary>
         /// <returns></returns>
         private async Task EnsureConnection()
         {
-            if (_effectiveEndpointBaseUri == null)
-            {
-                string httpUrl = $"http://{_configuration.Host}";
-                string httpsUrl = $"https://{_configuration.Host}";
+            if (this._effectiveEndpointBaseUri != null) return;
 
-                if (await ProbeSingleAsync(httpsUrl))
+            var httpsUrl = $"https://{this._configuration.Host}";
+            var httpUrl = $"http://{this._configuration.Host}";
+
+            var exceptions = new List<Exception>();
+
+            foreach (var url in new[] { httpsUrl, httpUrl })
+                try
                 {
-                    _effectiveEndpointBaseUri = new Uri(httpsUrl);
+                    await this.ProbeSingleAsync(url);
+                    this._effectiveEndpointBaseUri = new Uri(url);
+                    return;
                 }
-                else if (await ProbeSingleAsync(httpUrl))
+                catch (Exception ex)
                 {
-                    _effectiveEndpointBaseUri = new Uri(httpUrl);
+                    exceptions.Add(ex);
                 }
-                else
-                {
-                    throw new RegistryConnectionException($"Unable to connect to '{_configuration.Host}'");
-                }
-            }
+
+            throw new RegistryConnectionException(
+                $"Unable to connect to '{this._configuration.Host}' via HTTP or HTTPS",
+                new AggregateException(exceptions));
         }
 
-        async Task<bool> ProbeSingleAsync(string uri)
+        private async Task ProbeSingleAsync(string uri)
         {
-            try
+            using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
+            using (await this._client.SendAsync(request))
             {
-                using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
-                using (await _client.SendAsync(request))
-                {
-
-                }
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("  " + ex.GetType().Name);
-
-                return false;
             }
         }
 
@@ -103,14 +110,24 @@ namespace Docker.Registry.DotNet
             IDictionary<string, string> headers = null,
             Func<HttpContent> content = null)
         {
-            using (var response = await InternalMakeRequestAsync(DefaultTimeout,
-                HttpCompletionOption.ResponseContentRead, method, path, queryString, headers, content, cancellationToken))
+            using (var response = await this.InternalMakeRequestAsync(
+                                      this.DefaultTimeout,
+                                      HttpCompletionOption.ResponseContentRead,
+                                      method,
+                                      path,
+                                      queryString,
+                                      headers,
+                                      content,
+                                      cancellationToken))
             {
                 var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-                var apiResponse = new RegistryApiResponse<string>(response.StatusCode, responseBody, response.Headers);
+                var apiResponse = new RegistryApiResponse<string>(
+                    response.StatusCode,
+                    responseBody,
+                    response.Headers);
 
-                HandleIfErrorResponse(apiResponse);
+                this.HandleIfErrorResponse(apiResponse);
 
                 return apiResponse;
             }
@@ -122,13 +139,24 @@ namespace Docker.Registry.DotNet
             string path,
             IQueryString queryString = null)
         {
-            var response = await InternalMakeRequestAsync(InfiniteTimeout, HttpCompletionOption.ResponseHeadersRead, method, path, queryString, null, null, cancellationToken);
+            var response = await this.InternalMakeRequestAsync(
+                               InfiniteTimeout,
+                               HttpCompletionOption.ResponseHeadersRead,
+                               method,
+                               path,
+                               queryString,
+                               null,
+                               null,
+                               cancellationToken);
 
             var body = await response.Content.ReadAsStreamAsync();
 
-            var apiResponse = new RegistryApiResponse<Stream>(response.StatusCode, body, response.Headers);
+            var apiResponse = new RegistryApiResponse<Stream>(
+                response.StatusCode,
+                body,
+                response.Headers);
 
-            HandleIfErrorResponse(apiResponse);
+            this.HandleIfErrorResponse(apiResponse);
 
             return apiResponse;
         }
@@ -143,31 +171,38 @@ namespace Docker.Registry.DotNet
             Func<HttpContent> content,
             CancellationToken cancellationToken)
         {
-            await EnsureConnection();
+            await this.EnsureConnection();
 
-            var request = PrepareRequest(method, path, queryString, headers, content);
+            var request = this.PrepareRequest(method, path, queryString, headers, content);
 
             if (timeout != InfiniteTimeout)
             {
-                var timeoutTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                var timeoutTokenSource =
+                    CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
                 timeoutTokenSource.CancelAfter(timeout);
                 cancellationToken = timeoutTokenSource.Token;
             }
 
-            await _authenticationProvider.AuthenticateAsync(request);
+            await this._authenticationProvider.AuthenticateAsync(request);
 
-            var response = await _client.SendAsync(request, completionOption, cancellationToken);
+            var response = await this._client.SendAsync(
+                               request,
+                               completionOption,
+                               cancellationToken);
 
             if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
                 //Prepare another request (we can't reuse the same request)
-                var request2 = PrepareRequest(method, path, queryString, headers, content);
+                var request2 = this.PrepareRequest(method, path, queryString, headers, content);
 
                 //Authenticate given the challenge
-                await _authenticationProvider.AuthenticateAsync(request2, response);
+                await this._authenticationProvider.AuthenticateAsync(request2, response);
 
                 //Send it again
-                response = await _client.SendAsync(request2, completionOption, cancellationToken);
+                response = await this._client.SendAsync(
+                               request2,
+                               completionOption,
+                               cancellationToken);
             }
 
             return response;
@@ -176,50 +211,37 @@ namespace Docker.Registry.DotNet
         private void HandleIfErrorResponse(RegistryApiResponse response)
         {
             // If no customer handlers just default the response.
-            foreach (var handler in _errorHandlers)
-            {
-                handler(response);
-            }
+            foreach (var handler in this._errorHandlers) handler(response);
 
             // No custom handler was fired. Default the response for generic success/failures.
-            if (response.StatusCode < HttpStatusCode.OK || response.StatusCode >= HttpStatusCode.BadRequest)
-            {
+            if (response.StatusCode < HttpStatusCode.OK
+                || response.StatusCode >= HttpStatusCode.BadRequest)
                 throw new RegistryApiException(response);
-            }
         }
 
-        internal HttpRequestMessage PrepareRequest(HttpMethod method, string path, IQueryString queryString, IDictionary<string, string> headers, Func<HttpContent> content)
+        internal HttpRequestMessage PrepareRequest(
+            HttpMethod method,
+            string path,
+            IQueryString queryString,
+            IDictionary<string, string> headers,
+            Func<HttpContent> content)
         {
-            if (string.IsNullOrEmpty("path"))
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
+            if (string.IsNullOrEmpty("path")) throw new ArgumentNullException(nameof(path));
 
-            var request = new HttpRequestMessage(method, HttpUtility.BuildUri(_effectiveEndpointBaseUri, path, queryString));
+            var request = new HttpRequestMessage(
+                method,
+                HttpUtility.BuildUri(this._effectiveEndpointBaseUri, path, queryString));
 
             request.Headers.Add("User-Agent", UserAgent);
 
             if (headers != null)
-            {
                 foreach (var header in headers)
-                {
                     request.Headers.Add(header.Key, header.Value);
-                }
-            }
 
             //Create the content
             request.Content = content?.Invoke();
-           
+
             return request;
         }
-
-        public TimeSpan DefaultTimeout { get; set; }
-
-        public void Dispose()
-        {
-            _client?.Dispose();
-        }
-
-        public JsonSerializer JsonSerializer { get; }
     }
 }

@@ -9,8 +9,8 @@ namespace Docker.Registry.DotNet
         internal RegistryApiException(RegistryApiResponse response)
             : base($"Docker API responded with status code={response.StatusCode}")
         {
-            StatusCode = response.StatusCode;
-            Headers = response.Headers;
+            this.StatusCode = response.StatusCode;
+            this.Headers = response.Headers;
         }
 
         public HttpStatusCode StatusCode { get; }
