@@ -16,7 +16,7 @@ if (Test-Path .\artifacts) {
 
 Write-Output "build: Version is $version"
 
-& dotnet pack .\src\Docker.Registry.DotNet\Docker.Registry.DotNet.csproj -c Release -o ..\..\artifacts /p:Version="$version"
+& dotnet pack .\src\Docker.Registry.DotNet\Docker.Registry.DotNet.csproj -c Release -o .\artifacts /p:Version="$version"
 
 if ($LASTEXITCODE -ne 0) { exit 1 }    
 
