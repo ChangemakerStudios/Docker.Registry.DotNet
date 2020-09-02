@@ -10,14 +10,13 @@
 PM> Install-Package Docker.Registry.DotNet
 ```
 
-*Add nuget via dotnet CLI:*
+*Add nuget package via dotnet CLI:*
 ```
 dotnet add package Docker.Registry.DotNet
 ```
 
 # Usage
 ```csharp
-// w
 var configuration = new RegistryClientConfiguration("localhost:5000");
 
 using (var client = configuration.CreateClient())
