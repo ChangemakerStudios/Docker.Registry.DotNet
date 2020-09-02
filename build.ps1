@@ -9,8 +9,6 @@ If ($version -eq '') {
 
 Write-Output "build: Build started"
 
-Push-Location $PSScriptRoot
-
 if (Test-Path .\artifacts) {
     Write-Output "build: Cleaning .\artifacts"
     Remove-Item .\artifacts -Force -Recurse
@@ -33,5 +31,3 @@ foreach ($test in ls test/*.Tests) {
 
     if ($LASTEXITCODE -ne 0) { exit 3 }
 }
-
-Pop-Location
