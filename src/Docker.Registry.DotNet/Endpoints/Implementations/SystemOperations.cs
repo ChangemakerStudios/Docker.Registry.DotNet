@@ -15,7 +15,7 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
             this._client = client;
         }
 
-        public Task PingAsync(CancellationToken cancellationToken = new CancellationToken())
+        public Task PingAsync(CancellationToken cancellationToken = default)
         {
             return this._client.MakeRequestAsync(cancellationToken, HttpMethod.Get, "v2/");
         }

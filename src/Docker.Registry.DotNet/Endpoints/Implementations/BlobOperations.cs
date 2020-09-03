@@ -20,7 +20,7 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
         public async Task<GetBlobResponse> GetBlobAsync(
             string name,
             string digest,
-            CancellationToken cancellationToken = new CancellationToken())
+            CancellationToken cancellationToken = default)
         {
             var url = $"v2/{name}/blobs/{digest}";
 
@@ -37,7 +37,7 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
         public Task DeleteBlobAsync(
             string name,
             string digest,
-            CancellationToken cancellationToken = new CancellationToken())
+            CancellationToken cancellationToken = default)
         {
             var url = $"v2/{name}/blobs/{digest}";
 

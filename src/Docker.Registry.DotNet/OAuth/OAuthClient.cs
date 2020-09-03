@@ -18,7 +18,7 @@ namespace Docker.Registry.DotNet.OAuth
         private readonly HttpClient _client = new HttpClient();
 
         private async Task<OAuthToken> GetTokenInnerAsync(string realm, string service, string scope, string username,
-            string password, CancellationToken cancellationToken = new CancellationToken())
+            string password, CancellationToken cancellationToken = default)
         {
             var queryString = new QueryString();
 
@@ -56,12 +56,12 @@ namespace Docker.Registry.DotNet.OAuth
             }
         }
 
-        public Task<OAuthToken> GetTokenAsync(string realm, string service, string scope, CancellationToken cancellationToken = new CancellationToken())
+        public Task<OAuthToken> GetTokenAsync(string realm, string service, string scope, CancellationToken cancellationToken = default)
         {
             return GetTokenInnerAsync(realm, service, scope, null, null, cancellationToken);
         }
 
-        public Task<OAuthToken> GetTokenAsync(string realm, string service, string scope, string username, string password, CancellationToken cancellationToken = new CancellationToken())
+        public Task<OAuthToken> GetTokenAsync(string realm, string service, string scope, string username, string password, CancellationToken cancellationToken = default)
         {
             return GetTokenInnerAsync(realm, service, scope, username, password, cancellationToken);
         }

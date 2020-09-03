@@ -19,7 +19,7 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
 
         public async Task<Catalog> GetCatalogAsync(
             CatalogParameters parameters = null,
-            CancellationToken cancellationToken = new CancellationToken())
+            CancellationToken cancellationToken = default)
         {
             parameters = parameters ?? new CatalogParameters();
 

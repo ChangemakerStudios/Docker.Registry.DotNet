@@ -22,7 +22,7 @@ namespace Docker.Registry.DotNet.Models
         public long Size { get; set; }
 
         /// <summary>
-        ///     The digest of the content, as defined by the Registry V2 HTTP API Specificiation.
+        ///     The digest of the content, as defined by the Registry V2 HTTP API Specification.
         /// </summary>
         /// <remarks>https://docs.docker.com/registry/spec/api/#digest-parameter</remarks>
         [DataMember(Name = "digest")]

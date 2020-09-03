@@ -27,7 +27,7 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
         public async Task<GetImageManifestResult> GetManifestAsync(
             string name,
             string reference,
-            CancellationToken cancellationToken = new CancellationToken())
+            CancellationToken cancellationToken = default)
         {
             var headers = new Dictionary<string, string>
                           {
@@ -82,12 +82,12 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
         }
 
         //public Task PutManifestAsync(string name, string reference, ImageManifest manifest,
-        //    CancellationToken cancellationToken = new CancellationToken())
+        //    CancellationToken cancellationToken = default)
         //{
         //    throw new NotImplementedException();
         //}
 
-        //public Task<bool> DoesManifestExistAsync(string name, string reference, CancellationToken cancellation = new CancellationToken())
+        //public Task<bool> DoesManifestExistAsync(string name, string reference, CancellationToken cancellation = default)
         //{
         //    throw new NotImplementedException();
         //}
@@ -95,7 +95,7 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
         public async Task DeleteManifestAsync(
             string name,
             string reference,
-            CancellationToken cancellationToken = new CancellationToken())
+            CancellationToken cancellationToken = default)
         {
             var path = $"v2/{name}/manifests/{reference}";
 

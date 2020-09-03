@@ -35,7 +35,7 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
             int contentLength,
             Stream stream,
             string digest,
-            CancellationToken cancellationToken = new CancellationToken())
+            CancellationToken cancellationToken = default)
         {
             var path = $"v2/{name}/blobs/uploads/";
 
@@ -149,7 +149,7 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
         public Task<ResumableUploadResponse> InitiateBlobUploadAsync(
             string name,
             Stream stream = null,
-            CancellationToken cancellationToken = new CancellationToken())
+            CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
@@ -157,7 +157,7 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
         public Task<MountResponse> MountBlobAsync(
             string name,
             MountParameters parameters,
-            CancellationToken cancellationToken = new CancellationToken())
+            CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
@@ -165,7 +165,7 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
         public Task<BlobUploadStatus> GetBlobUploadStatus(
             string name,
             string uuid,
-            CancellationToken cancellationToken = new CancellationToken())
+            CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
@@ -174,7 +174,7 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
             string name,
             string uuid,
             Stream chunk,
-            CancellationToken cancellationToken = new CancellationToken())
+            CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
@@ -183,7 +183,7 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
             string name,
             string uuid,
             Stream chunk = null,
-            CancellationToken cancellationToken = new CancellationToken())
+            CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
@@ -191,7 +191,7 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
         public Task CancelBlobUploadAsync(
             string name,
             string uuid,
-            CancellationToken cancellationToken = new CancellationToken())
+            CancellationToken cancellationToken = default)
         {
             var path = $"v2/{name}/blobs/uploads/{uuid}";
 

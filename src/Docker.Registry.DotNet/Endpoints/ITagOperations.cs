@@ -1,11 +1,18 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+
 using Docker.Registry.DotNet.Models;
+
+using JetBrains.Annotations;
 
 namespace Docker.Registry.DotNet.Endpoints
 {
     public interface ITagOperations
     {
-        Task<ListImageTagsResponse> ListImageTagsAsync(string name, ListImageTagsParameters parameters, CancellationToken cancellationToken = new CancellationToken());
+        [PublicAPI]
+        Task<ListImageTagsResponse> ListImageTagsAsync(
+            string name,
+            ListImageTagsParameters parameters,
+            CancellationToken cancellationToken = default);
     }
 }
