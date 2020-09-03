@@ -2,6 +2,7 @@
 
 using Docker.Registry.DotNet.Authentication;
 using Docker.Registry.DotNet.Endpoints;
+using Docker.Registry.DotNet.Endpoints.Implementations;
 
 namespace Docker.Registry.DotNet.Registry
 {

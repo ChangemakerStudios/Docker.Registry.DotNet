@@ -96,7 +96,7 @@ namespace Docker.Registry.DotNet.Registry
             foreach (var url in tryUrls)
                 try
                 {
-                    await this.ProbeSingleAsync(url);
+                    await this.ProbeSingleAsync($"{url}/v2/");
                     this._effectiveEndpointBaseUri = new Uri(url);
                     return;
                 }
@@ -106,7 +106,7 @@ namespace Docker.Registry.DotNet.Registry
                 }
 
             throw new RegistryConnectionException(
-                $"Unable to connect to any: {tryUrls.Select(s => $"'{s}'").ToDelimitedString(", ")}'",
+                $"Unable to connect to any: {tryUrls.Select(s => $"'{s}/v2/'").ToDelimitedString(", ")}'",
                 new AggregateException(exceptions));
         }
 
@@ -246,7 +246,7 @@ namespace Docker.Registry.DotNet.Registry
 
             var request = new HttpRequestMessage(
                 method,
-                HttpUtility.BuildUri(this._effectiveEndpointBaseUri, path, queryString));
+                this._effectiveEndpointBaseUri.BuildUri(path, queryString));
 
             request.Headers.Add("User-Agent", UserAgent);
             request.Headers.AddRange(headers);
