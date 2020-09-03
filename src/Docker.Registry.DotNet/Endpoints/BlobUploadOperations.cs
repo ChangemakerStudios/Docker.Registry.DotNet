@@ -7,7 +7,10 @@ using System.Net.Http.Headers;
 using System.Runtime;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Docker.Registry.DotNet.Helpers;
 using Docker.Registry.DotNet.Models;
+using Docker.Registry.DotNet.Registry;
 
 namespace Docker.Registry.DotNet.Endpoints
 {

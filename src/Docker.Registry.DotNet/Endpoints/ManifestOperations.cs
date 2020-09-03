@@ -5,7 +5,9 @@ using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Docker.Registry.DotNet.Helpers;
 using Docker.Registry.DotNet.Models;
+using Docker.Registry.DotNet.Registry;
 
 using JetBrains.Annotations;
 

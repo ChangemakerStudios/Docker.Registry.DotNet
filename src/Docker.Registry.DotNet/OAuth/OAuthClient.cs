@@ -3,6 +3,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Docker.Registry.DotNet.Helpers;
+
 using Newtonsoft.Json;
 
 namespace Docker.Registry.DotNet.OAuth

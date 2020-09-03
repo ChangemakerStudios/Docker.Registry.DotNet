@@ -1,4 +1,6 @@
-﻿namespace Docker.Registry.DotNet.Endpoints
+﻿using Docker.Registry.DotNet.Registry;
+
+namespace Docker.Registry.DotNet.Endpoints
 {
     using System.Net.Http;
     using System.Threading;

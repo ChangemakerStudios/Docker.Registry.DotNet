@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Docker.Registry.DotNet.Helpers;
+
 namespace Docker.Registry.DotNet.Authentication
 {
     internal static class AuthenticateParser

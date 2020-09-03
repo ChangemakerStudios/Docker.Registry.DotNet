@@ -2,6 +2,7 @@
 using System.Threading;
 
 using Docker.Registry.DotNet.Authentication;
+using Docker.Registry.DotNet.Registry;
 
 using JetBrains.Annotations;
 
