@@ -8,5 +8,4 @@ namespace Docker.Registry.DotNet.Models
         [DataMember(Name = "repositories", EmitDefaultValue = false)]
         public string[] Repositories { get; set; }
     }
-
 }

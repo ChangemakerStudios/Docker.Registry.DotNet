@@ -51,6 +51,7 @@ namespace Docker.Registry.DotNet.Endpoints
         /// <param name="reference"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [PublicAPI]
         Task DeleteManifestAsync(
             string name,
             string reference,

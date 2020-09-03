@@ -3,7 +3,7 @@
 namespace Docker.Registry.DotNet.Registry
 {
     /// <summary>
-    /// Thrown when connecting to a registry fails.
+    ///     Thrown when connecting to a registry fails.
     /// </summary>
     public class RegistryConnectionException : Exception
     {
@@ -13,12 +13,14 @@ namespace Docker.Registry.DotNet.Registry
         }
 
         /// <inheritdoc />
-        public RegistryConnectionException(string message) : base(message)
+        public RegistryConnectionException(string message)
+            : base(message)
         {
         }
 
         /// <inheritdoc />
-        public RegistryConnectionException(string message, Exception innerException) : base(message, innerException)
+        public RegistryConnectionException(string message, Exception innerException)
+            : base(message, innerException)
         {
         }
     }

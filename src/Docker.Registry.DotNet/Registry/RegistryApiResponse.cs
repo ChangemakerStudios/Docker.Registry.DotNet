@@ -18,7 +18,11 @@ namespace Docker.Registry.DotNet.Registry
 
     internal class RegistryApiResponse<TBody> : RegistryApiResponse
     {
-        internal RegistryApiResponse(HttpStatusCode statusCode, TBody body, HttpResponseHeaders headers) : base(statusCode, headers)
+        internal RegistryApiResponse(
+            HttpStatusCode statusCode,
+            TBody body,
+            HttpResponseHeaders headers)
+            : base(statusCode, headers)
         {
             this.Body = body;
         }

@@ -2,10 +2,9 @@
 {
     public class BlobHeader
     {
-
         internal BlobHeader(string dockerContentDigest)
         {
-            DockerContentDigest = dockerContentDigest;
+            this.DockerContentDigest = dockerContentDigest;
         }
 
         public string DockerContentDigest { get; }
