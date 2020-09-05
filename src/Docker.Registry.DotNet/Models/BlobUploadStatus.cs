@@ -1,5 +1,8 @@
-﻿namespace Docker.Registry.DotNet.Models
+﻿using JetBrains.Annotations;
+
+namespace Docker.Registry.DotNet.Models
 {
+    [PublicAPI]
     public class BlobUploadStatus
     {
         /// <summary>

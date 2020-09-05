@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -6,15 +7,17 @@ using Docker.Registry.DotNet.Helpers;
 using Docker.Registry.DotNet.Models;
 using Docker.Registry.DotNet.Registry;
 
+using JetBrains.Annotations;
+
 namespace Docker.Registry.DotNet.Endpoints.Implementations
 {
     internal class CatalogOperations : ICatalogOperations
     {
         private readonly NetworkClient _client;
 
-        public CatalogOperations(NetworkClient client)
+        public CatalogOperations([NotNull] NetworkClient client)
         {
-            this._client = client;
+            this._client = client ?? throw new ArgumentNullException(nameof(client));
         }
 
         public async Task<Catalog> GetCatalogAsync(
@@ -25,8 +28,7 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
 
             var queryParameters = new QueryString();
 
-            queryParameters.AddIfNotNull("n", parameters.Number);
-            queryParameters.AddIfNotNull("last", parameters.Last);
+            queryParameters.AddFromObjectWithQueryParameters(parameters);
 
             var response = await this._client.MakeRequestAsync(
                                cancellationToken,

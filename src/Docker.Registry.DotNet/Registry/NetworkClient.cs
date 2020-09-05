@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -126,6 +127,12 @@ namespace Docker.Registry.DotNet.Registry
             IDictionary<string, string> headers = null,
             Func<HttpContent> content = null)
         {
+            //Console.WriteLine(
+            //    "Requesting Path: {0} Method: {1} QueryString: {2}",
+            //    path,
+            //    method,
+            //    queryString?.GetQueryString());
+
             using (var response = await this.InternalMakeRequestAsync(
                                       this.DefaultTimeout,
                                       HttpCompletionOption.ResponseContentRead,

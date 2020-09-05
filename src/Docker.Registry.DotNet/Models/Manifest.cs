@@ -1,7 +1,10 @@
 ﻿using System.Runtime.Serialization;
 
+using JetBrains.Annotations;
+
 namespace Docker.Registry.DotNet.Models
 {
+    [PublicAPI]
     public class Manifest
     {
         /// <summary>

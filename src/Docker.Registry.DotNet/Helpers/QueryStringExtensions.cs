@@ -1,7 +1,44 @@
-﻿namespace Docker.Registry.DotNet.Helpers
+﻿using System;
+using System.Linq;
+using System.Reflection;
+
+using Docker.Registry.DotNet.QueryParameters;
+
+using JetBrains.Annotations;
+
+namespace Docker.Registry.DotNet.Helpers
 {
     internal static class QueryStringExtensions
     {
+        /// <summary>
+        /// Adds query parameters using reflection. Object must have [QueryParameter] attributes
+        /// on it's properties for it to map properly.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="queryString"></param>
+        /// <param name="instance"></param>
+        internal static void AddFromObjectWithQueryParameters<T>(this QueryString queryString, [NotNull] T instance)
+            where T: class
+        {
+            if (instance == null) throw new ArgumentNullException(nameof(instance));
+
+            var propertyInfos = instance.GetType().GetProperties();
+
+            foreach (var p in propertyInfos)
+            {
+                var attribute = p.GetCustomAttribute<QueryParameterAttribute>();
+                if (attribute != null)
+                {
+                    // TODO: Use a nuget like FastMember to improve performance here or switch to static delegate generation
+                    var value = p.GetValue(instance, null);
+                    if (value != null)
+                    {
+                        queryString.Add(attribute.Key, value.ToString());
+                    }
+                }
+            }
+        }
+
         /// <summary>
         ///     Adds the value to the query string if it's not null.
         /// </summary>

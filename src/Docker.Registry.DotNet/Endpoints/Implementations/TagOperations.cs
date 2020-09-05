@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -6,15 +7,17 @@ using Docker.Registry.DotNet.Helpers;
 using Docker.Registry.DotNet.Models;
 using Docker.Registry.DotNet.Registry;
 
+using JetBrains.Annotations;
+
 namespace Docker.Registry.DotNet.Endpoints.Implementations
 {
     internal class TagOperations : ITagOperations
     {
         private readonly NetworkClient _client;
 
-        public TagOperations(NetworkClient client)
+        public TagOperations([NotNull] NetworkClient client)
         {
-            this._client = client;
+            this._client = client ?? throw new ArgumentNullException(nameof(client));
         }
 
         public async Task<ListImageTagsResponse> ListImageTagsAsync(
@@ -22,11 +25,16 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
             ListImageTagsParameters parameters = null,
             CancellationToken cancellationToken = default)
         {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentException(
+                    $"'{nameof(name)}' cannot be null or empty",
+                    nameof(name));
+
             parameters = parameters ?? new ListImageTagsParameters();
 
             var queryString = new QueryString();
 
-            queryString.AddIfNotNull("n", parameters.Number);
+            queryString.AddFromObjectWithQueryParameters(parameters);
 
             var response = await this._client.MakeRequestAsync(
                                cancellationToken,
