@@ -49,7 +49,7 @@ namespace Docker.Registry.DotNet.OAuth
             using (var response = await this._client.SendAsync(request, cancellationToken))
             {
                 if (!response.IsSuccessStatusCode)
-                    throw new UnauthorizedAccessException("Unable to authenticate..");
+                    throw new UnauthorizedAccessException("Unable to authenticate.");
 
                 var body = await response.Content.ReadAsStringAsync();
 

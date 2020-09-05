@@ -12,7 +12,7 @@ namespace Docker.Registry.DotNet.Endpoints
         [PublicAPI]
         Task<ListImageTagsResponse> ListImageTagsAsync(
             string name,
-            ListImageTagsParameters parameters,
+            ListImageTagsParameters parameters = null,
             CancellationToken cancellationToken = default);
     }
 }

@@ -17,7 +17,7 @@ namespace Docker.Registry.DotNet.Endpoints
         /// <returns></returns>
         [PublicAPI]
         Task<Catalog> GetCatalogAsync(
-            CatalogParameters parameters,
+            CatalogParameters parameters = null,
             CancellationToken cancellationToken = default);
     }
 }
