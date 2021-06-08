@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Docker.Registry.DotNet", "s
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1 - Library", "1 - Library", "{B66D3CF0-84C9-4CAE-9995-FF5D5BDBA441}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2 - Tests", "2 - Tests", "{B17A48CD-2D33-44FE-B304-38378536A5F3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Docker.Registry.DotNet.Tests", "test\Docker.Registry.DotNet.Tests\Docker.Registry.DotNet.Tests.csproj", "{DB3EDE19-27D5-4BBE-842A-614755576BE4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,12 +21,17 @@ Global
 		{4E407B44-8D47-4C72-AC8E-6FCB9DBF7CC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4E407B44-8D47-4C72-AC8E-6FCB9DBF7CC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4E407B44-8D47-4C72-AC8E-6FCB9DBF7CC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB3EDE19-27D5-4BBE-842A-614755576BE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB3EDE19-27D5-4BBE-842A-614755576BE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB3EDE19-27D5-4BBE-842A-614755576BE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB3EDE19-27D5-4BBE-842A-614755576BE4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{4E407B44-8D47-4C72-AC8E-6FCB9DBF7CC9} = {B66D3CF0-84C9-4CAE-9995-FF5D5BDBA441}
+		{DB3EDE19-27D5-4BBE-842A-614755576BE4} = {B17A48CD-2D33-44FE-B304-38378536A5F3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9001024B-B865-4E2D-A0D5-812683BF066F}
