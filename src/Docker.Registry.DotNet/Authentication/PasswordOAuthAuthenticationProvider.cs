@@ -43,12 +43,14 @@ namespace Docker.Registry.DotNet.Authentication
             var token = await this._client.GetTokenAsync(
                             bearerBits.Realm,
                             bearerBits.Service,
-                            bearerBits.Scope,
+                            //Also include the repository(plugin) resource type to be able to access plugin repositories.
+                            //See https://docs.docker.com/registry/spec/auth/scope/
+                            bearerBits.Scope + " " + (bearerBits.Scope.Replace("repository:", "repository(plugin):")),
                             this._username,
                             this._password);
 
             //Set the header
-            request.Headers.Authorization = new AuthenticationHeaderValue(Schema, token.Token);
+            request.Headers.Authorization = new AuthenticationHeaderValue(Schema, token.AccessToken);
         }
     }
 }
