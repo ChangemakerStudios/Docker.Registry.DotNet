@@ -6,7 +6,7 @@ namespace Docker.Registry.DotNet.Models
     {
         /// <summary>
         ///     Limit the number of entries in each response. It not present, all entries will be returned
-        /// </summary
+        /// </summary>
         [QueryParameter("n")]
         public int? Number { get; set; }
     }
