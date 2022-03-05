@@ -3,6 +3,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,6 +20,30 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
         internal BlobUploadOperations(NetworkClient client)
         {
             this._client = client;
+        }
+
+        public async Task<ResumableUpload> StartUploadBlobAsync(string name, CancellationToken cancellationToken = default)
+        {
+            var path = $"v2/{name}/blobs/uploads/";
+            var response = await this._client.MakeRequestAsync(
+                               cancellationToken,
+                               HttpMethod.Post,
+                               path);
+            return new ResumableUpload()
+            {
+                DockerUploadUuid = response.Headers.GetString("Docker-Upload-UUID"),
+                Location = response.Headers.GetString("location"),
+                Range = response.Headers.GetString("Range")
+            };
+        }
+
+
+        public Task<CompletedUploadResponse> MonolithicUploadBlobAsync(ResumableUpload resumable,
+                                                                       string digest,
+                                                                       Stream stream,
+                                                                       CancellationToken cancellationToken = default)
+        {
+            return CompleteBlobUploadAsync(resumable, digest, stream,cancellationToken: cancellationToken);
         }
 
         /// <summary>
@@ -71,9 +96,9 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
                     var request = new HttpRequestMessage(
                                       new HttpMethod("PATCH"),
                                       location + $"&digest={digest}")
-                                  {
-                                      Content = content
-                                  };
+                    {
+                        Content = content
+                    };
 
                     var response2 = await client.SendAsync(request, cancellationToken);
 
@@ -146,7 +171,7 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
             //await _client.MakeRequestAsync(cancellationToken, HttpMethod.Put, location, queryString);
         }
 
-        public Task<ResumableUploadResponse> InitiateBlobUploadAsync(
+        public Task<ResumableUpload> InitiateBlobUploadAsync(
             string name,
             Stream stream = null,
             CancellationToken cancellationToken = default)
@@ -170,22 +195,65 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<ResumableUploadResponse> UploadBlobChunkAsync(
-            string name,
-            string uuid,
-            Stream chunk,
-            CancellationToken cancellationToken = default)
+        public async Task<ResumableUpload> UploadBlobChunkAsync(ResumableUpload resumable,
+                                                          Stream chunk,
+                                                          long? from = null,
+                                                          long? to = null,
+                                                          CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var response = await this._client.MakeRequestAsync(
+                              cancellationToken,
+                              new HttpMethod("PATCH"),
+                              resumable.Location,
+                              content: () =>
+                              {
+                                  var content = new StreamContent(chunk);
+                                  content.Headers.ContentLength = chunk.Length;
+                                  content.Headers.ContentType =
+                                      new MediaTypeHeaderValue("application/octet-stream");
+                                  content.Headers.ContentRange = new ContentRangeHeaderValue(from ?? 0, to ?? chunk.Length);
+                                  return content;
+                              }).ConfigureAwait(false);
+
+            return new ResumableUpload()
+            {
+                DockerUploadUuid = response.Headers.GetString("Docker-Upload-UUID"),
+                Location = response.Headers.GetString("location"),
+                Range = response.Headers.GetString("Range")
+            };
         }
 
-        public Task<ResumableUploadResponse> CompleteBlobUploadAsync(
-            string name,
-            string uuid,
-            Stream chunk = null,
-            CancellationToken cancellationToken = default)
+        public async Task<CompletedUploadResponse> CompleteBlobUploadAsync(ResumableUpload resumable,
+                                                     string digest,
+                                                     Stream chunk = null,
+                                                     long? from = null,
+                                                     long? to = null,
+                                                     CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var queryString = new QueryString();
+            queryString.Add("digest", digest);
+
+            var response = await this._client.MakeRequestAsync(
+                              cancellationToken,
+                              HttpMethod.Put,
+                              resumable.Location,
+                              queryString, 
+                              content: () =>
+                                {
+                                    if (chunk is null) chunk = new MemoryStream();
+                                    var content = new StreamContent(chunk);
+                                    content.Headers.ContentLength = chunk.Length;
+                                    content.Headers.ContentType =
+                                        new MediaTypeHeaderValue("application/octet-stream");
+                                    content.Headers.ContentRange = new ContentRangeHeaderValue(from??0, to??chunk.Length);
+                                    return content;
+                                }).ConfigureAwait(false);
+
+            return new CompletedUploadResponse()
+            {
+                DockerContentDigest = response.Headers.GetString("Docker-Content-Digest"),
+                Location = response.Headers.GetString("location"),
+            };
         }
 
         public Task CancelBlobUploadAsync(
@@ -197,5 +265,6 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
 
             return this._client.MakeRequestAsync(cancellationToken, HttpMethod.Delete, path);
         }
+
     }
 }

@@ -5,6 +5,7 @@ namespace Docker.Registry.DotNet.Models
     [DataContract]
     public class ImageManifest2_2  : ImageManifest
     {
+
         /// <summary>
         /// The MIME type of the referenced object
         /// </summary>

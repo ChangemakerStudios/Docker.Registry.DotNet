@@ -34,5 +34,14 @@ namespace Docker.Registry.DotNet.Endpoints
             string name,
             string digest,
             CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Existing Layers
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="digest"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<bool> IsExistBlobAsync(string name, string digest, CancellationToken cancellationToken = default);
     }
 }

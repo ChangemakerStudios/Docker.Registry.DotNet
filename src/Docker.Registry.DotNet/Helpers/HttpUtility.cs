@@ -1,12 +1,10 @@
-﻿using System;
+﻿using Docker.Registry.DotNet.Registry;
+using JetBrains.Annotations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-
-using Docker.Registry.DotNet.Registry;
-
-using JetBrains.Annotations;
 
 namespace Docker.Registry.DotNet.Helpers
 {
@@ -16,12 +14,22 @@ namespace Docker.Registry.DotNet.Helpers
         {
             if (baseUri == null) throw new ArgumentNullException(nameof(baseUri));
 
-            var builder = new UriBuilder(baseUri);
+            var pathIsUri = Uri.TryCreate(path, UriKind.Absolute, out Uri uri);
 
-            if (!string.IsNullOrEmpty(path)) builder.Path += path;
+            if (!pathIsUri)
+                uri = baseUri;
 
-            if (queryString != null) builder.Query = queryString.GetQueryString();
+            var builder = new UriBuilder(uri);
 
+            if (!pathIsUri && !string.IsNullOrEmpty(path)) builder.Path += path;
+
+            if (queryString != null)
+            {
+                if (string.IsNullOrWhiteSpace(builder.Query))
+                    builder.Query = queryString.GetQueryString();
+                else
+                    builder.Query += "&" + queryString.GetQueryString();
+            }
             return builder.Uri;
         }
 

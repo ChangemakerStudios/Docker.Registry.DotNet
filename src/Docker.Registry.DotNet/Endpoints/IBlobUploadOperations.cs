@@ -36,7 +36,7 @@ namespace Docker.Registry.DotNet.Endpoints
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [PublicAPI]
-        Task<ResumableUploadResponse> InitiateBlobUploadAsync(
+        Task<ResumableUpload> InitiateBlobUploadAsync(
             string name,
             Stream stream = null,
             CancellationToken cancellationToken = default);
@@ -71,31 +71,37 @@ namespace Docker.Registry.DotNet.Endpoints
         /// <summary>
         ///     Upload a chunk of data for the specified upload.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="uuid"></param>
+        /// <param name="resumable"></param>
         /// <param name="chunk"></param>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [PublicAPI]
-        Task<ResumableUploadResponse> UploadBlobChunkAsync(
-            string name,
-            string uuid,
+        Task<ResumableUpload> UploadBlobChunkAsync(
+            ResumableUpload resumable,
             Stream chunk,
+            long? from = null,
+            long? to = null,
             CancellationToken cancellationToken = default);
 
         /// <summary>
-        ///     Complete the upload specified by uuid, optionally appending the body as the final chunk.
+        ///     Complete the upload specified by ResumableUploadResponse, optionally appending the body as the final chunk.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="uuid"></param>
+        /// <param name="resumable"></param>
+        /// <param name="digest"></param>
         /// <param name="chunk"></param>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [PublicAPI]
-        Task<ResumableUploadResponse> CompleteBlobUploadAsync(
-            string name,
-            string uuid,
+        Task<CompletedUploadResponse> CompleteBlobUploadAsync(
+            ResumableUpload resumable,
+            string digest,
             Stream chunk = null,
+            long? from = null,
+            long? to = null,
             CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -111,5 +117,23 @@ namespace Docker.Registry.DotNet.Endpoints
             string name,
             string uuid,
             CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Starting An Upload
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<ResumableUpload> StartUploadBlobAsync(string name, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// A monolithic upload is simply a chunked upload with a single chunk and may be favored by clients that would like to avoided the complexity of chunking
+        /// </summary>
+        /// <param name="resumable"></param>
+        /// <param name="digest"></param>
+        /// <param name="stream"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<CompletedUploadResponse> MonolithicUploadBlobAsync(ResumableUpload resumable, string digest, Stream stream, CancellationToken cancellationToken = default);
     }
 }

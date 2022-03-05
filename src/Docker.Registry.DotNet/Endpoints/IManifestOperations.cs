@@ -34,27 +34,15 @@ namespace Docker.Registry.DotNet.Endpoints
         ///// <returns></returns>
         //Task<bool> DoesManifestExistAsync(string name, string reference, CancellationToken cancellation = default);
 
-        ///// <summary>
-        ///// Put the manifest identified by name and reference where reference can be a tag or digest.
-        ///// </summary>
-        ///// <param name="name"></param>
-        ///// <param name="reference"></param>
-        ///// <param name="manifest"></param>
-        ///// <param name="cancellationToken"></param>
-        ///// <returns></returns>
-        //Task PutManifestAsync(string name, string reference, ImageManifest manifest, CancellationToken cancellationToken = default);
-
         /// <summary>
-        ///     Delete the manifest identified by name and reference. Note that a manifest can only be deleted by digest.
+        /// Put the manifest identified by name and reference where reference can be a tag or digest.
         /// </summary>
         /// <param name="name"></param>
         /// <param name="reference"></param>
+        /// <param name="manifest"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        [PublicAPI]
-        Task DeleteManifestAsync(
-            string name,
-            string reference,
-            CancellationToken cancellationToken = default);
+        Task<PushManifestResponse> PutManifestAsync(string name, string reference, ImageManifest manifest, CancellationToken cancellationToken = default);
+
     }
 }
