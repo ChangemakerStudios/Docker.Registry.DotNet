@@ -1,15 +1,13 @@
-﻿using System;
+﻿using Docker.Registry.DotNet.Helpers;
+using Docker.Registry.DotNet.Models;
+using Docker.Registry.DotNet.Registry;
+using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
 using System.Threading.Tasks;
-
-using Docker.Registry.DotNet.Helpers;
-using Docker.Registry.DotNet.Models;
-using Docker.Registry.DotNet.Registry;
 
 namespace Docker.Registry.DotNet.Endpoints.Implementations
 {
@@ -190,12 +188,13 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
 
             var response = await this._client.MakeRequestAsync(cancellationToken,
                      HttpMethod.Post,
-                     $"/v2/{name}/blobs/uploads/",
+                     $"v2/{name}/blobs/uploads/",
                      queryString);
             return new MountResponse
             {
                 DockerUploadUuid = response.Headers.GetString("Docker-Upload-UUID"),
-                Location = response.Headers.GetString("location")
+                Location = response.Headers.GetString("location"),
+                Created= response.StatusCode== HttpStatusCode.Created,
             };
         }
 
