@@ -194,7 +194,7 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
             {
                 DockerUploadUuid = response.Headers.GetString("Docker-Upload-UUID"),
                 Location = response.Headers.GetString("location"),
-                Created= response.StatusCode== HttpStatusCode.Created,
+                Created = response.StatusCode == HttpStatusCode.Created,
             };
         }
 
@@ -226,6 +226,7 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
                               resumable.Location,
                               content: () =>
                               {
+                                  chunk.Position = 0;
                                   var content = new StreamContent(chunk);
                                   content.Headers.ContentLength = chunk.Length;
                                   content.Headers.ContentType =
@@ -260,6 +261,7 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
                               content: () =>
                                 {
                                     if (chunk is null) chunk = new MemoryStream();
+                                    chunk.Position = 0;
                                     var content = new StreamContent(chunk);
                                     content.Headers.ContentLength = chunk.Length;
                                     content.Headers.ContentType =
