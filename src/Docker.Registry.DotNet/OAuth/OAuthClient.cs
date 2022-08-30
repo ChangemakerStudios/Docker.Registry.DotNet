@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -23,27 +24,38 @@ namespace Docker.Registry.DotNet.OAuth
             string password,
             CancellationToken cancellationToken = default)
         {
-            var queryString = new QueryString();
+            HttpRequestMessage request;
 
-            queryString.AddIfNotEmpty("service", service);
-            queryString.AddIfNotEmpty("scope", scope);
-
-            var builder = new UriBuilder(new Uri(realm))
-                          {
-                              Query = queryString.GetQueryString()
-                          };
-
-            var request = new HttpRequestMessage(HttpMethod.Get, builder.Uri);
-
-            if (username != null && password != null)
+            if (username == null || password == null)
             {
-                // https://gist.github.com/jlhawn/8f218e7c0b14c941c41f
+                var queryString = new QueryString();
 
-                var bytes = Encoding.UTF8.GetBytes($"{username}:{password}");
+                queryString.AddIfNotEmpty("service", service);
+                queryString.AddIfNotEmpty("scope", scope);
 
-                var parameter = Convert.ToBase64String(bytes);
+                var builder = new UriBuilder(new Uri(realm))
+                            {
+                                Query = queryString.GetQueryString()
+                            };
 
-                request.Headers.Authorization = new AuthenticationHeaderValue("Basic", parameter);
+                request = new HttpRequestMessage(HttpMethod.Get, builder.Uri);
+            }
+            else
+            {
+                request = new HttpRequestMessage(HttpMethod.Post, realm)
+                {
+                    Content = new FormUrlEncodedContent(
+                        new Dictionary<string, string>()
+                        {
+                            {"client_id", "Docker.Registry.DotNet"},
+                            {"grant_type", "password"},
+                            {"username", username},
+                            {"password", password},
+                            {"service", service},
+                            {"scope", scope},
+                        }
+                    ),
+                };
             }
 
             using (var response = await this._client.SendAsync(request, cancellationToken))

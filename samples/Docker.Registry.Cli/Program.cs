@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Docker.Registry.DotNet;
 using Docker.Registry.DotNet.Authentication;
 using Docker.Registry.DotNet.Models;
+using Docker.Registry.DotNet.Registry;
 
 namespace Docker.Registry.Cli
 {
@@ -35,7 +36,7 @@ namespace Docker.Registry.Cli
             //string url = "https://registry-1.docker.io/";
             string url = "http://10.0.4.44:5000/";
 
-            var configuration = new RegistryClientConfiguration(new Uri(url));
+            var configuration = new RegistryClientConfiguration(url);
 
             using (var client = configuration.CreateClient())
             {
