@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Http;
 using System.Threading;
 
 using Docker.Registry.DotNet.Authentication;
@@ -22,6 +23,22 @@ namespace Docker.Registry.DotNet
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(host));
 
             this.Host = host;
+        }
+
+        /// <summary>
+        ///     Creates an instance of the RegistryClientConfiguration.
+        /// </summary>
+        /// <param name="host"></param>
+        /// <param name="httpMessageHandler"></param>
+        /// <param name="defaultTimeout"></param>
+        public RegistryClientConfiguration(string host, HttpMessageHandler httpMessageHandler, TimeSpan defaultTimeout = default)
+            : this(defaultTimeout)
+        {
+            if (string.IsNullOrWhiteSpace(host))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(host));
+
+            this.Host = host;
+            this.HttpMessageHandler = httpMessageHandler;
         }
 
         /// <summary>
@@ -56,6 +73,8 @@ namespace Docker.Registry.DotNet
         public Uri EndpointBaseUri { get; }
 
         public string Host { get; }
+
+        public HttpMessageHandler HttpMessageHandler { get; }
 
         public TimeSpan DefaultTimeout { get; internal set; } = TimeSpan.FromSeconds(100);
 

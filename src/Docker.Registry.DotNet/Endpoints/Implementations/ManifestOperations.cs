@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -55,10 +56,10 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
                                this._client.JsonSerializer.DeserializeObject<ImageManifest2_1>(
                                    response.Body),
                                response.Body)
-                           {
-                               DockerContentDigest = response.GetHeader("Docker-Content-Digest"),
-                               Etag = response.GetHeader("Etag")
-                           };
+                    {
+                        DockerContentDigest = response.GetHeader("Docker-Content-Digest"),
+                        Etag = response.GetHeader("Etag")
+                    };
 
                 case ManifestMediaTypes.ManifestSchema2:
                     return new GetImageManifestResult(
@@ -66,9 +67,9 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
                                this._client.JsonSerializer.DeserializeObject<ImageManifest2_2>(
                                    response.Body),
                                response.Body)
-                           {
-                               DockerContentDigest = response.GetHeader("Docker-Content-Digest")
-                           };
+                    {
+                        DockerContentDigest = response.GetHeader("Docker-Content-Digest")
+                    };
 
                 case ManifestMediaTypes.ManifestList:
                     return new GetImageManifestResult(
@@ -144,6 +145,40 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
                                headers).ConfigureAwait(false);
 
             return response.Body;
+        }
+
+        public async Task<PushManifestResponse> PutManifestAsync(
+            string name,
+            string reference,
+            ImageManifest manifest,
+            CancellationToken cancellationToken)
+        {
+            string manifestMediaType = null;
+            if (manifest is ImageManifest2_1)
+                manifestMediaType = ManifestMediaTypes.ManifestSchema1;
+            if (manifest is ImageManifest2_2)
+                manifestMediaType = ManifestMediaTypes.ManifestSchema2;
+            if (manifest is ManifestList)
+                manifestMediaType = ManifestMediaTypes.ManifestList;
+
+            var response = await this._client.MakeRequestAsync(
+                                cancellationToken,
+                                HttpMethod.Put,
+                                $"v2/{name}/manifests/{reference}",
+                                content: () =>
+                                {
+                                    var content = new StringContent(this._client.JsonSerializer.SerializeObject(manifest));
+                                    content.Headers.ContentType =
+                                        new MediaTypeHeaderValue(manifestMediaType);
+                                    return content;
+                                }).ConfigureAwait(false);
+
+            return new PushManifestResponse
+            {
+                DockerContentDigest = response.GetHeader("Docker-Content-Digest"),
+                ContentLength = response.GetHeader("Content-Length"),
+                Location = response.GetHeader("location"),
+            };
         }
 
         private class SchemaCheck

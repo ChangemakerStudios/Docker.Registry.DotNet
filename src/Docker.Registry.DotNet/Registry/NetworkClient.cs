@@ -48,8 +48,10 @@ namespace Docker.Registry.DotNet.Registry
             this._authenticationProvider = authenticationProvider
                                            ?? throw new ArgumentNullException(
                                                nameof(authenticationProvider));
-
-            this._client = new HttpClient();
+            if (configuration.HttpMessageHandler is null)
+                this._client = new HttpClient();
+            else
+                this._client = new HttpClient(configuration.HttpMessageHandler);
 
             this.DefaultTimeout = configuration.DefaultTimeout;
 
@@ -156,6 +158,41 @@ namespace Docker.Registry.DotNet.Registry
             }
         }
 
+        internal async Task<RegistryApiResponse<string>> MakeRequestNotErrorAsync(
+            CancellationToken cancellationToken,
+            HttpMethod method,
+            string path,
+            IQueryString queryString = null,
+            IDictionary<string, string> headers = null,
+            Func<HttpContent> content = null)
+        {
+            //Console.WriteLine(
+            //    "Requesting Path: {0} Method: {1} QueryString: {2}",
+            //    path,
+            //    method,
+            //    queryString?.GetQueryString());
+
+            using (var response = await this.InternalMakeRequestAsync(
+                                      this.DefaultTimeout,
+                                      HttpCompletionOption.ResponseContentRead,
+                                      method,
+                                      path,
+                                      queryString,
+                                      headers,
+                                      content,
+                                      cancellationToken))
+            {
+                var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                var apiResponse = new RegistryApiResponse<string>(
+                    response.StatusCode,
+                    responseBody,
+                    response.Headers);
+
+                return apiResponse;
+            }
+        }
+
         internal async Task<RegistryApiResponse<Stream>> MakeRequestForStreamedResponseAsync(
             CancellationToken cancellationToken,
             HttpMethod method,
@@ -231,7 +268,7 @@ namespace Docker.Registry.DotNet.Registry
             return response;
         }
 
-        private void HandleIfErrorResponse(RegistryApiResponse response)
+        internal void HandleIfErrorResponse(RegistryApiResponse response)
         {
             // If no customer handlers just default the response.
             foreach (var handler in this._errorHandlers) handler(response);

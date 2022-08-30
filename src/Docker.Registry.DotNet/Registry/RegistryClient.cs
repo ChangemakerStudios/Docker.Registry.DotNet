@@ -8,6 +8,7 @@ namespace Docker.Registry.DotNet.Registry
 {
     internal sealed class RegistryClient : IRegistryClient
     {
+        private readonly NetworkClient _client;
         public RegistryClient(
             RegistryClientConfiguration configuration,
             AuthenticationProvider authenticationProvider)
@@ -17,14 +18,14 @@ namespace Docker.Registry.DotNet.Registry
             if (authenticationProvider == null)
                 throw new ArgumentNullException(nameof(authenticationProvider));
 
-            var client = new NetworkClient(configuration, authenticationProvider);
+            _client = new NetworkClient(configuration, authenticationProvider);
 
-            this.Manifest = new ManifestOperations(client);
-            this.Catalog = new CatalogOperations(client);
-            this.Blobs = new BlobOperations(client);
-            this.BlobUploads = new BlobUploadOperations(client);
-            this.System = new SystemOperations(client);
-            this.Tags = new TagOperations(client);
+            this.Manifest = new ManifestOperations(_client);
+            this.Catalog = new CatalogOperations(_client);
+            this.Blobs = new BlobOperations(_client);
+            this.BlobUploads = new BlobUploadOperations(_client);
+            this.System = new SystemOperations(_client);
+            this.Tags = new TagOperations(_client);
         }
 
         public IBlobUploadOperations BlobUploads { get; }
@@ -41,6 +42,7 @@ namespace Docker.Registry.DotNet.Registry
 
         public void Dispose()
         {
+            _client?.Dispose();
         }
     }
 }

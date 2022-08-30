@@ -30,6 +30,12 @@ namespace Docker.Registry.DotNet.Registry
         IBlobOperations Blobs { get; }
 
         /// <summary>
+        /// Blob Upload operations
+        /// </summary>
+        [PublicAPI]
+        IBlobUploadOperations BlobUploads { get; }
+
+        /// <summary>
         ///     Tag operations
         /// </summary>
         [PublicAPI]

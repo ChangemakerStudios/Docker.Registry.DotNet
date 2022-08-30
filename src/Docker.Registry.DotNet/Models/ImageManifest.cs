@@ -2,6 +2,7 @@
 
 namespace Docker.Registry.DotNet.Models
 {
+    [DataContract]
     public abstract class ImageManifest
     {
         /// <summary>
