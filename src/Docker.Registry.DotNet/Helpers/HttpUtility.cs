@@ -44,7 +44,7 @@ namespace Docker.Registry.DotNet.Helpers
             if (response == null) throw new ArgumentNullException(nameof(response));
 
             return response.Headers
-                .FirstOrDefault(h => h.Key == name).Value?.FirstOrDefault();
+                .FirstOrDefault(h => h.Key.Equals(name, StringComparison.OrdinalIgnoreCase)).Value?.FirstOrDefault();
         }
 
         /// <summary>

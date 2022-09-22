@@ -45,7 +45,7 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
                                null,
                                headers).ConfigureAwait(false);
 
-            var digestReference = response.GetHeader("docker-content-digest");
+            var digestReference = response.GetHeader("Docker-Content-Digest");
 
             response = await this._client.MakeRequestAsync(
                                cancellationToken,
