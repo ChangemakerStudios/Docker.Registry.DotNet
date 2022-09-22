@@ -17,4 +17,15 @@ namespace Docker.Registry.DotNet.Registry
 
         public HttpResponseHeaders Headers { get; }
     }
+
+    public class RegistryApiException<TBody> : RegistryApiException
+    {
+        internal RegistryApiException(RegistryApiResponse<TBody> response)
+            : base(response)
+        {
+            this.Body = response.Body;
+        }
+
+        public TBody Body { get; }
+    }
 }
