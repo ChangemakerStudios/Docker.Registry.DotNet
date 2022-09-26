@@ -268,6 +268,17 @@ namespace Docker.Registry.DotNet.Registry
             return response;
         }
 
+        internal void HandleIfErrorResponse(RegistryApiResponse<string> response)
+        {
+            // If no customer handlers just default the response.
+            foreach (var handler in this._errorHandlers) handler(response);
+
+            // No custom handler was fired. Default the response for generic success/failures.
+            if (response.StatusCode < HttpStatusCode.OK
+                || response.StatusCode >= HttpStatusCode.BadRequest)
+                throw new RegistryApiException<string>(response);
+        }
+
         internal void HandleIfErrorResponse(RegistryApiResponse response)
         {
             // If no customer handlers just default the response.
