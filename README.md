@@ -26,3 +26,10 @@ using (var client = configuration.CreateClient())
     await client.System.PingAsync();
 }
 ```
+
+# Changelog
+
+### v1.1.33
+* Added Basic Authentication (thanks Zguy).
+* Fixed issue with operational parameters (thanks lostllama).
+* Fixed issue with large manifest layers (thanks msvprogs).
