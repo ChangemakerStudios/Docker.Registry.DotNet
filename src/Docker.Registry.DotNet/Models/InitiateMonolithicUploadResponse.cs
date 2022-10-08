@@ -1,5 +1,4 @@
-﻿
-namespace Docker.Registry.DotNet.Models
+﻿namespace Docker.Registry.DotNet.Models
 {
     public class InitiateMonolithicUploadResponse
     {

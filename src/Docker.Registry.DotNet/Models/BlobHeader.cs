@@ -1,11 +1,13 @@
-﻿namespace Docker.Registry.DotNet.Models
+﻿using JetBrains.Annotations;
+
+namespace Docker.Registry.DotNet.Models
 {
+    [PublicAPI]
     public class BlobHeader
     {
-
         internal BlobHeader(string dockerContentDigest)
         {
-            DockerContentDigest = dockerContentDigest;
+            this.DockerContentDigest = dockerContentDigest;
         }
 
         public string DockerContentDigest { get; }

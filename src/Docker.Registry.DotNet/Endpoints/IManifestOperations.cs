@@ -1,11 +1,14 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+
 using Docker.Registry.DotNet.Models;
+
+using JetBrains.Annotations;
 
 namespace Docker.Registry.DotNet.Endpoints
 {
     /// <summary>
-    /// Manifest operations.
+    ///     Manifest operations.
     /// </summary>
     public interface IManifestOperations
     {
@@ -16,7 +19,11 @@ namespace Docker.Registry.DotNet.Endpoints
         ///// <param name="reference"></param>
         ///// <param name="cancellationToken"></param>
         ///// <returns></returns>
-        Task<GetImageManifestResult> GetManifestAsync(string name, string reference, CancellationToken cancellationToken = new CancellationToken());
+        [PublicAPI]
+        Task<GetImageManifestResult> GetManifestAsync(
+            string name,
+            string reference,
+            CancellationToken cancellationToken = default);
 
         ///// <summary>
         ///// Returns true if the image exists, false otherwise.
@@ -25,25 +32,17 @@ namespace Docker.Registry.DotNet.Endpoints
         ///// <param name="reference"></param>
         ///// <param name="cancellation"></param>
         ///// <returns></returns>
-        //Task<bool> DoesManifestExistAsync(string name, string reference, CancellationToken cancellation = new CancellationToken());
-
-        ///// <summary>
-        ///// Put the manifest identified by name and reference where reference can be a tag or digest.
-        ///// </summary>
-        ///// <param name="name"></param>
-        ///// <param name="reference"></param>
-        ///// <param name="manifest"></param>
-        ///// <param name="cancellationToken"></param>
-        ///// <returns></returns>
-        //Task PutManifestAsync(string name, string reference, ImageManifest manifest, CancellationToken cancellationToken = new CancellationToken());
+        //Task<bool> DoesManifestExistAsync(string name, string reference, CancellationToken cancellation = default);
 
         /// <summary>
-        /// Delete the manifest identified by name and reference. Note that a manifest can only be deleted by digest.
+        /// Put the manifest identified by name and reference where reference can be a tag or digest.
         /// </summary>
         /// <param name="name"></param>
         /// <param name="reference"></param>
+        /// <param name="manifest"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task DeleteManifestAsync(string name, string reference, CancellationToken cancellationToken = new CancellationToken());
+        Task<PushManifestResponse> PutManifestAsync(string name, string reference, ImageManifest manifest, CancellationToken cancellationToken = default);
+
     }
 }
