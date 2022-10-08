@@ -2,11 +2,11 @@
 {
     public class GetImageManifestResult
     {
-        internal GetImageManifestResult(string mediaType, ImageManifest manifest, string content) 
+        internal GetImageManifestResult(string mediaType, ImageManifest manifest, string content)
         {
-            Manifest = manifest;
-            Content = content;
-            MediaType = mediaType;
+            this.Manifest = manifest;
+            this.Content = content;
+            this.MediaType = mediaType;
         }
 
         public string DockerContentDigest { get; internal set; }
@@ -16,12 +16,12 @@
         public string MediaType { get; }
 
         /// <summary>
-        /// The image manifest
+        ///     The image manifest
         /// </summary>
         public ImageManifest Manifest { get; }
 
         /// <summary>
-        /// Gets the original, raw body returned from the server.
+        ///     Gets the original, raw body returned from the server.
         /// </summary>
         public string Content { get; }
     }

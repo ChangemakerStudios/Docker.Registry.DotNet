@@ -11,7 +11,7 @@ namespace Docker.Registry.DotNet.Models
         /// <summary>
         /// name is the name of the image’s repository
         /// </summary>
-        [DataMember(Name = "name")]               
+        [DataMember(Name = "name")]
         public string Name { get; set; }
 
         /// <summary>
