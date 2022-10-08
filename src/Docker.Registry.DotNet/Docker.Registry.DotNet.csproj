@@ -3,7 +3,6 @@
 		<TargetFrameworks>net46;netstandard1.6;netstandard2.0</TargetFrameworks>
 		<NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.6' ">1.6.1</NetStandardImplicitPackageVersion>
 		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
-		<RepositoryType>git</RepositoryType>
 		<LangVersion>latest</LangVersion>
 		<NoWarn>1701;1702;1591</NoWarn>
 	</PropertyGroup>
@@ -22,6 +21,17 @@
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageTags>docker registry .net C# client</PackageTags>
 	</PropertyGroup>
+
+	<PropertyGroup>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+	</ItemGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|AnyCPU'">
 		<DefineConstants>TRACE</DefineConstants>
