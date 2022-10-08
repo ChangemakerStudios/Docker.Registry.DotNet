@@ -23,6 +23,7 @@ using JetBrains.Annotations;
 
 namespace Docker.Registry.DotNet.Endpoints
 {
+    [PublicAPI]
     public interface IBlobUploadOperations
     {
         /// <summary>
@@ -33,13 +34,13 @@ namespace Docker.Registry.DotNet.Endpoints
         /// <param name="digest"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        //[PublicAPI]
-        //Task UploadBlobAsync(
-        //    string name,
-        //    int contentLength,
-        //    Stream stream,
-        //    string digest,
-        //    CancellationToken cancellationToken = default);
+        [PublicAPI]
+        Task UploadBlobAsync(
+            string name,
+            int contentLength,
+            Stream stream,
+            string digest,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         ///     Initiate a resumable blob upload. If successful, an upload location will be provided to complete the upload.
