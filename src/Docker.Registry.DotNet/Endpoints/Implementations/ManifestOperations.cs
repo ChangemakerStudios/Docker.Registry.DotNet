@@ -141,12 +141,6 @@ namespace Docker.Registry.DotNet.Endpoints.Implementations
             };
         }
 
-        //public Task PutManifestAsync(string name, string reference, ImageManifest manifest,
-        //    CancellationToken cancellationToken = default)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
         //public Task<bool> DoesManifestExistAsync(string name, string reference, CancellationToken cancellation = default)
         //{
         //    throw new NotImplementedException();

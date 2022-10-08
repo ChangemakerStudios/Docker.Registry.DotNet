@@ -1,124 +1,145 @@
-﻿using System.Runtime.InteropServices;
-using System.Security.Policy;
+﻿using System;
+using System.Windows;
+using System.Windows.Input;
+
+using Autofac;
+
+using Cas.Common.WPF.Interfaces;
+
+using Docker.Registry.DotNet.Models;
+using Docker.Registry.DotNet.Registry;
+
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.CommandWpf;
 
 namespace DockerRegistryExplorer.ViewModel
 {
-    using System;
-    using System.Windows;
-    using System.Windows.Input;
-    using Autofac;
-    using Cas.Common.WPF.Interfaces;
-    using Docker.Registry.DotNet;
-    using Docker.Registry.DotNet.Models;
-    using GalaSoft.MvvmLight;
-    using GalaSoft.MvvmLight.CommandWpf;
-
     public class TagViewModel : ViewModelBase
     {
-        private readonly ILifetimeScope _scope;
-        private readonly IRegistryClient _registryClient;
         private readonly IMessageBoxService _messageBoxService;
-        private readonly IViewService _viewService;
+
         private readonly RepositoryViewModel _parent;
+
+        private readonly IRegistryClient _registryClient;
+
+        private readonly ILifetimeScope _scope;
+
+        private readonly IViewService _viewService;
 
         public TagViewModel(
             ILifetimeScope scope,
-            IRegistryClient registryClient, 
+            IRegistryClient registryClient,
             IMessageBoxService messageBoxService,
             IViewService viewService,
             RepositoryViewModel parent,
-            string repository, 
+            string repository,
             string tag)
         {
-            _scope = scope ?? throw new ArgumentNullException(nameof(scope));
-            _registryClient = registryClient ?? throw new ArgumentNullException(nameof(registryClient));
-            _messageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
-            _viewService = viewService ?? throw new ArgumentNullException(nameof(viewService));
-            _parent = parent ?? throw new ArgumentNullException(nameof(parent));
-            Repository = repository;
-            Tag = tag;
+            this._scope = scope ?? throw new ArgumentNullException(nameof(scope));
+            this._registryClient =
+                registryClient ?? throw new ArgumentNullException(nameof(registryClient));
+            this._messageBoxService = messageBoxService
+                                      ?? throw new ArgumentNullException(nameof(messageBoxService));
+            this._viewService = viewService ?? throw new ArgumentNullException(nameof(viewService));
+            this._parent = parent ?? throw new ArgumentNullException(nameof(parent));
+            this.Repository = repository;
+            this.Tag = tag;
 
-            CopyTagCommand = new RelayCommand(CopyTag);
-            GetManifestCommand = new RelayCommand(GetManifest);
-            ViewManifestCommand = new RelayCommand(ViewManifest);
-            DeleteCommand = new RelayCommand(Delete, CanDelete);
+            this.CopyTagCommand = new RelayCommand(this.CopyTag);
+            this.GetManifestCommand = new RelayCommand(this.GetManifest);
+            this.ViewManifestCommand = new RelayCommand(this.ViewManifest);
+            this.DeleteCommand = new RelayCommand(this.Delete, this.CanDelete);
         }
 
         public ICommand GetManifestCommand { get; }
+
         public ICommand ViewManifestCommand { get; }
+
         public ICommand DeleteCommand { get; }
 
         public ICommand CopyTagCommand { get; }
 
         public AsyncExecutor Executor { get; } = new AsyncExecutor();
 
+        public string Repository { get; }
+
+        public string Tag { get; }
+
         private void CopyTag()
         {
-            Uri uri = new Uri(_parent.Parent.Url);
+            var uri = new Uri(this._parent.Parent.Url);
 
-            string hostname = uri.Host;
+            var hostname = uri.Host;
 
-            string qualified = $"{hostname}/{Repository}:{Tag}";
+            var qualified = $"{hostname}/{this.Repository}:{this.Tag}";
 
             Clipboard.SetText(qualified);
         }
 
         private async void Delete()
         {
-            if (_messageBoxService.Show($"Delete tag '{Repository}:{Tag}'?", "Delete tag", MessageBoxButton.YesNo) ==
+            if (this._messageBoxService.Show(
+                    $"Delete tag '{this.Repository}:{this.Tag}'?",
+                    "Delete tag",
+                    MessageBoxButton.YesNo) ==
                 MessageBoxResult.Yes)
             {
-                var ex = await Executor.ExecuteAsync(async () =>
+                var ex = await this.Executor.ExecuteAsync(
+                    async () =>
                     {
                         //We need to get the digest of the manifest
-                        var manifest = await _registryClient.Manifest.GetManifestAsync(Repository, Tag);
+                        var manifest =
+                            await this._registryClient.Manifest.GetManifestAsync(
+                                this.Repository,
+                                this.Tag);
 
-                        string digest = manifest.DockerContentDigest;
+                        var digest = manifest.DockerContentDigest;
 
                         if (string.IsNullOrWhiteSpace(digest))
-                        {
-                            _messageBoxService.Show("Unable to find digest.");
-                        }
+                            this._messageBoxService.Show("Unable to find digest.");
                         else
-                        {
-                            await _registryClient.Manifest.DeleteManifestAsync(Repository, digest);    
-                        }
+                            await this._registryClient.Manifest.DeleteManifestAsync(
+                                this.Repository,
+                                digest);
                     });
 
                 if (ex == null)
-                {
                     //Refresh
-                    _parent.Refresh();
-                }
+                    this._parent.Refresh();
             }
         }
 
         private bool CanDelete()
         {
-            return !Executor.IsBusy;
+            return !this.Executor.IsBusy;
         }
 
         private async void GetManifest()
         {
             GetImageManifestResult result = null;
 
-            var ex = await Executor.ExecuteAsync(async () =>
-            {
-                result = await _registryClient.Manifest.GetManifestAsync(Repository, Tag);
-            });
+            var ex = await this.Executor.ExecuteAsync(
+                async () =>
+                {
+                    result = await this._registryClient.Manifest.GetManifestAsync(
+                        this.Repository,
+                        this.Tag);
+                });
 
             if (ex != null)
             {
-                _messageBoxService.Show(ex.Message, "Get manifest");
+                this._messageBoxService.Show(ex.Message, "Get manifest");
             }
             else
             {
-                var textDialogViewModel = _scope.Resolve<TextDialogViewModel>(
+                var textDialogViewModel = this._scope.Resolve<TextDialogViewModel>(
                     new NamedParameter("text", result.Content),
-                    new NamedParameter("title", $"Manfiest - {Repository}:{Tag}:{result.MediaType}")
-                    );
+                    new NamedParameter(
+                        "title",
+                        $"Manfiest - {this.Repository}:{this.Tag}:{result.MediaType}")
+                );
 
-                _viewService.Show(textDialogViewModel);
+                this._viewService.Show(textDialogViewModel);
             }
         }
 
@@ -126,14 +147,17 @@ namespace DockerRegistryExplorer.ViewModel
         {
             GetImageManifestResult result = null;
 
-            var ex = await Executor.ExecuteAsync(async () =>
-            {
-                result = await _registryClient.Manifest.GetManifestAsync(Repository, Tag);
-            });
+            var ex = await this.Executor.ExecuteAsync(
+                async () =>
+                {
+                    result = await this._registryClient.Manifest.GetManifestAsync(
+                        this.Repository,
+                        this.Tag);
+                });
 
             if (ex != null)
             {
-                _messageBoxService.Show(ex.Message);
+                this._messageBoxService.Show(ex.Message);
             }
             else
             {
@@ -141,25 +165,18 @@ namespace DockerRegistryExplorer.ViewModel
 
                 if (manifest == null)
                 {
-                    _messageBoxService.Show("Unsupported manifest type.");
+                    this._messageBoxService.Show("Unsupported manifest type.");
                 }
                 else
                 {
-                    var dialogViewModel = _scope.Resolve<ManifestDialogViewModel>
-                    (
+                    var dialogViewModel = this._scope.Resolve<ManifestDialogViewModel>(
                         new TypedParameter(typeof(ImageManifest2_2), manifest),
-                        new TypedParameter(GetType(), this)
+                        new TypedParameter(this.GetType(), this)
                     );
 
-                    _viewService.ShowDialog(dialogViewModel);
+                    this._viewService.ShowDialog(dialogViewModel);
                 }
             }
         }
-
-        public string Repository { get; }
-
-        public string Tag { get; }
-
-        
     }
 }

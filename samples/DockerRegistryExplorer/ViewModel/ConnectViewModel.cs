@@ -1,4 +1,6 @@
-﻿namespace DockerRegistryExplorer.ViewModel
+﻿using Docker.Registry.DotNet.Registry;
+
+namespace DockerRegistryExplorer.ViewModel
 {
     using System;
     using Docker.Registry.DotNet;

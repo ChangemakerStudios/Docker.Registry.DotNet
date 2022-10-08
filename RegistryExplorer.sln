@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2036
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32414.318
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Docker.Registry.DotNet", "src\Docker.Registry.DotNet\Docker.Registry.DotNet.csproj", "{4E407B44-8D47-4C72-AC8E-6FCB9DBF7CC9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DockerRegistryExplorer", "src\DockerRegistryExplorer\DockerRegistryExplorer.csproj", "{513C7B92-BFAF-4E0A-B8D9-FC0E7283CD62}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DockerRegistryExplorer", "samples\DockerRegistryExplorer\DockerRegistryExplorer.csproj", "{513C7B92-BFAF-4E0A-B8D9-FC0E7283CD62}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
