@@ -1,6 +1,8 @@
 # <img src="https://github.com/ChangemakerStudios/Docker.Registry.DotNet/raw/master/assets/docker_registry_dotnet.png" width="24" height="24" /> Docker.Registry.DotNet
 
-[![NuGet version](https://badge.fury.io/nu/Docker.Registry.DotNet.svg)](https://badge.fury.io/nu/Docker.Registry.DotNet) [![Build status](https://ci.appveyor.com/api/projects/status/n8pemuwbqkr3vipu?svg=true)](https://ci.appveyor.com/project/Jaben/docker-registry-dotnet) [![Downloads](https://img.shields.io/nuget/dt/Docker.Registry.DotNet.svg?logo=nuget&color=purple)](https://www.nuget.org/packages/Docker.Registry.DotNet)
+[![NuGet version](https://badge.fury.io/nu/Docker.Registry.DotNet.svg)](https://badge.fury.io/nu/Docker.Registry.DotNet)
+[![Build and Push to Nuget](https://github.com/ChangemakerStudios/Docker.Registry.DotNet/actions/workflows/publish.yml/badge.svg)](https://github.com/ChangemakerStudios/Docker.Registry.DotNet/actions/workflows/publish.yml)
+[![Downloads](https://img.shields.io/nuget/dt/Docker.Registry.DotNet.svg?logo=nuget&color=purple)](https://www.nuget.org/packages/Docker.Registry.DotNet)
 
 .NET (C#) Client Library for interacting with a Docker Registry API (v2 only).
 
