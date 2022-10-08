@@ -25,6 +25,7 @@ namespace Docker.Registry.DotNet.Endpoints;
 /// <summary>
 ///     Manifest operations.
 /// </summary>
+[PublicAPI]
 public interface IManifestOperations
 {
     /// <summary>
