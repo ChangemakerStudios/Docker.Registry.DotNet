@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30413.136
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32414.318
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Docker.Registry.DotNet", "src\Docker.Registry.DotNet\Docker.Registry.DotNet.csproj", "{4E407B44-8D47-4C72-AC8E-6FCB9DBF7CC9}"
 EndProject
@@ -10,6 +10,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2 - Tests", "2 - Tests", "{B17A48CD-2D33-44FE-B304-38378536A5F3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Docker.Registry.DotNet.Tests", "test\Docker.Registry.DotNet.Tests\Docker.Registry.DotNet.Tests.csproj", "{DB3EDE19-27D5-4BBE-842A-614755576BE4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0 - Assets", "0 - Assets", "{930B1DE3-07F0-442C-903A-57B38DD5C46E}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\publish.yml = .github\workflows\publish.yml
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

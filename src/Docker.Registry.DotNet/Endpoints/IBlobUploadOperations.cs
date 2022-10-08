@@ -1,4 +1,19 @@
-﻿using System.IO;
+﻿//  Copyright 2017-2022 Rich Quackenbush, Jaben Cargman
+//  and Docker.Registry.DotNet Contributors
+// 
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+// 
+//      http://www.apache.org/licenses/LICENSE-2.0
+// 
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -124,7 +139,9 @@ namespace Docker.Registry.DotNet.Endpoints
         /// <param name="name"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<ResumableUpload> StartUploadBlobAsync(string name, CancellationToken cancellationToken = default);
+        Task<ResumableUpload> StartUploadBlobAsync(
+            string name,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// A monolithic upload is simply a chunked upload with a single chunk and may be favored by clients that would like to avoided the complexity of chunking
@@ -134,6 +151,10 @@ namespace Docker.Registry.DotNet.Endpoints
         /// <param name="stream"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<CompletedUploadResponse> MonolithicUploadBlobAsync(ResumableUpload resumable, string digest, Stream stream, CancellationToken cancellationToken = default);
+        Task<CompletedUploadResponse> MonolithicUploadBlobAsync(
+            ResumableUpload resumable,
+            string digest,
+            Stream stream,
+            CancellationToken cancellationToken = default);
     }
 }

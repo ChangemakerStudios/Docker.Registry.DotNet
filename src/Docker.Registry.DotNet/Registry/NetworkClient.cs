@@ -1,6 +1,20 @@
-﻿using System;
+﻿//  Copyright 2017-2022 Rich Quackenbush, Jaben Cargman
+//  and Docker.Registry.DotNet Contributors
+// 
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+// 
+//      http://www.apache.org/licenses/LICENSE-2.0
+// 
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -136,14 +150,14 @@ namespace Docker.Registry.DotNet.Registry
             //    queryString?.GetQueryString());
 
             using (var response = await this.InternalMakeRequestAsync(
-                                      this.DefaultTimeout,
-                                      HttpCompletionOption.ResponseContentRead,
-                                      method,
-                                      path,
-                                      queryString,
-                                      headers,
-                                      content,
-                                      cancellationToken))
+                       this.DefaultTimeout,
+                       HttpCompletionOption.ResponseContentRead,
+                       method,
+                       path,
+                       queryString,
+                       headers,
+                       content,
+                       cancellationToken))
             {
                 var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
@@ -173,14 +187,14 @@ namespace Docker.Registry.DotNet.Registry
             //    queryString?.GetQueryString());
 
             using (var response = await this.InternalMakeRequestAsync(
-                                      this.DefaultTimeout,
-                                      HttpCompletionOption.ResponseContentRead,
-                                      method,
-                                      path,
-                                      queryString,
-                                      headers,
-                                      content,
-                                      cancellationToken))
+                       this.DefaultTimeout,
+                       HttpCompletionOption.ResponseContentRead,
+                       method,
+                       path,
+                       queryString,
+                       headers,
+                       content,
+                       cancellationToken))
             {
                 var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
@@ -200,14 +214,14 @@ namespace Docker.Registry.DotNet.Registry
             IQueryString queryString = null)
         {
             var response = await this.InternalMakeRequestAsync(
-                               InfiniteTimeout,
-                               HttpCompletionOption.ResponseHeadersRead,
-                               method,
-                               path,
-                               queryString,
-                               null,
-                               null,
-                               cancellationToken);
+                InfiniteTimeout,
+                HttpCompletionOption.ResponseHeadersRead,
+                method,
+                path,
+                queryString,
+                null,
+                null,
+                cancellationToken);
 
             var body = await response.Content.ReadAsStreamAsync();
 
@@ -246,9 +260,9 @@ namespace Docker.Registry.DotNet.Registry
             await this._authenticationProvider.AuthenticateAsync(request);
 
             var response = await this._client.SendAsync(
-                               request,
-                               completionOption,
-                               cancellationToken);
+                request,
+                completionOption,
+                cancellationToken);
 
             if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
@@ -260,9 +274,9 @@ namespace Docker.Registry.DotNet.Registry
 
                 //Send it again
                 response = await this._client.SendAsync(
-                               request2,
-                               completionOption,
-                               cancellationToken);
+                    request2,
+                    completionOption,
+                    cancellationToken);
             }
 
             return response;

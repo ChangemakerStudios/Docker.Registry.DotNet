@@ -13,16 +13,32 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Docker.Registry.DotNet.Helpers
+namespace Docker.Registry.DotNet;
+
+internal static class DictionaryExtensions
 {
-    public static class EnumerableExtensions
+    public static string GetQueryString(this IDictionary<string, string[]> values)
     {
-        public static IEnumerable<T> IfNullEmpty<T>(this IEnumerable<T> enumerable)
-        {
-            return enumerable ?? Enumerable.Empty<T>();
-        }
+        return string.Join(
+            "&",
+            values.Select(
+                pair => string.Join(
+                    "&",
+                    pair.Value.Select(
+                        v => $"{Uri.EscapeUriString(pair.Key)}={Uri.EscapeDataString(v)}"))));
+    }
+
+    public static TValue GetValueOrDefault<TKey, TValue>(
+        this IDictionary<TKey, TValue> dict,
+        TKey key)
+    {
+        if (dict.TryGetValue(key, out var value))
+            return value;
+
+        return default;
     }
 }
