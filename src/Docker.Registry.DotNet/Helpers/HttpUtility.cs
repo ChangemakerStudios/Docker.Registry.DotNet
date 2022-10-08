@@ -1,10 +1,27 @@
-﻿using Docker.Registry.DotNet.Registry;
-using JetBrains.Annotations;
+﻿//  Copyright 2017-2022 Rich Quackenbush, Jaben Cargman
+//  and Docker.Registry.DotNet Contributors
+// 
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+// 
+//      http://www.apache.org/licenses/LICENSE-2.0
+// 
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+
+using Docker.Registry.DotNet.Registry;
+
+using JetBrains.Annotations;
 
 namespace Docker.Registry.DotNet.Helpers
 {
@@ -30,6 +47,7 @@ namespace Docker.Registry.DotNet.Helpers
                 else
                     builder.Query += "&" + queryString.GetQueryString();
             }
+
             return builder.Uri;
         }
 
@@ -44,7 +62,8 @@ namespace Docker.Registry.DotNet.Helpers
             if (response == null) throw new ArgumentNullException(nameof(response));
 
             return response.Headers
-                .FirstOrDefault(h => h.Key.Equals(name, StringComparison.OrdinalIgnoreCase)).Value?.FirstOrDefault();
+                .FirstOrDefault(h => h.Key.Equals(name, StringComparison.OrdinalIgnoreCase)).Value
+                ?.FirstOrDefault();
         }
 
         /// <summary>
@@ -95,7 +114,9 @@ namespace Docker.Registry.DotNet.Helpers
             return null;
         }
 
-        public static string GetString([NotNull] this HttpResponseHeaders responseHeaders, string name)
+        public static string GetString(
+            [NotNull] this HttpResponseHeaders responseHeaders,
+            string name)
         {
             if (responseHeaders == null) throw new ArgumentNullException(nameof(responseHeaders));
 
