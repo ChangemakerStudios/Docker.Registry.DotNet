@@ -30,6 +30,6 @@ using (var client = configuration.CreateClient())
 # Changelog
 
 ### v1.1.33
-* Added Basic Authentication (thanks Zguy).
-* Fixed issue with operational parameters (thanks lostllama).
-* Fixed issue with large manifest layers (thanks msvprogs).
+* Added Basic Authentication (thanks [Zguy](https://github.com/Zguy)).
+* Fixed issue with operational parameters (thanks [lostllama](https://github.com/lostllama)).
+* Fixed issue with large manifest layers (thanks [msvprogs](https://github.com/msvprogs)).
