@@ -10,7 +10,7 @@
         xmlns:converters="clr-namespace:Cas.Common.WPF.Converters;assembly=Cas.Common.WPF"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance viewModel:MainViewModel}"
-        Title="Docker Registry Explorer" Height="500" Width="700">
+        Title="Docker Registry Explorer" Height="500" Width="700" FontSize="14">
 
     <i:Interaction.Behaviors>
         <behaviors:CloseableBehavior/>

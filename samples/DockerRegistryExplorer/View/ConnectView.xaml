@@ -18,7 +18,7 @@
              Title="Connect"
             Loaded="ConnectView_OnLoaded"
              d:DataContext="{d:DesignInstance viewModel:ConnectViewModel}"
-             Width="400">
+             Width="400" FontSize="14">
 
     <i:Interaction.Behaviors>
         <behaviors:CloseableBehavior/>
@@ -30,12 +30,16 @@
     </Window.Resources>
 
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="9*"/>
+            <ColumnDefinition Width="71*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Grid>
+        <Grid Grid.ColumnSpan="2">
             <Grid.Resources>
                 <Style x:Key="BaseStyle" TargetType="FrameworkElement">
                     <Setter Property="Margin" Value="4"/>
@@ -82,21 +86,21 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0">Endpoint</TextBlock>
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Endpoint:"/>
             <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=Endpoint, UpdateSourceTrigger=PropertyChanged}" x:Name="EndpointTextBox" />
 
             <TextBlock Grid.Row="1" Grid.Column="0">Anonymous?</TextBlock>
             <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding Path=IsAnonymous}"/>
 
-            <TextBlock Grid.Row="2" Grid.Column="0">Username</TextBlock>
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Username:"/>
             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Path=Username, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Path=IsAnonymous, Converter={StaticResource InverseBooleanConverter}}"/>
 
-            <TextBlock Grid.Row="3" Grid.Column="0">Pasword</TextBlock>
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Password:"/>
             <controls1:BindablePasswordBox Grid.Row="3" Grid.Column="1" Password="{Binding Path=Password, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Path=IsAnonymous, Converter={StaticResource InverseBooleanConverter}}"/>
         </Grid>
 
 
-        <Grid Grid.Row="1">
+        <Grid Grid.ColumnSpan="2" Margin="0,112,0,0" Grid.RowSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -105,7 +109,7 @@
             </Grid.ColumnDefinitions>
 
             <controls:BusyIndicator Grid.Column="1" VerticalAlignment="Center" Margin="2" Visibility="{Binding Path=Executor.IsBusy, Converter={StaticResource HiddenWhenFalseConverter}}"/>
-            <Button Grid.Column="2" MinWidth="100" Margin="4" IsDefault="True" Command="{Binding Path=OkCommand}">_OK</Button>
+            <Button Grid.Column="2" MinWidth="100" Margin="4" IsDefault="True" Command="{Binding OkCommand}" Content="Connect"/>
             <Button Grid.Column="3" MinWidth="100" Margin="4" IsCancel="True">_Cancel</Button>
         </Grid>
     </Grid>

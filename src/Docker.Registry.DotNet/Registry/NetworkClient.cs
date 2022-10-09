@@ -129,7 +129,7 @@ namespace Docker.Registry.DotNet.Registry
 
         private async Task ProbeSingleAsync(string uri)
         {
-            using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
+            using var request = new HttpRequestMessage(HttpMethod.Get, uri);
             using (await this._client.SendAsync(request))
             {
             }
@@ -149,27 +149,26 @@ namespace Docker.Registry.DotNet.Registry
             //    method,
             //    queryString?.GetQueryString());
 
-            using (var response = await this.InternalMakeRequestAsync(
-                       this.DefaultTimeout,
-                       HttpCompletionOption.ResponseContentRead,
-                       method,
-                       path,
-                       queryString,
-                       headers,
-                       content,
-                       cancellationToken))
-            {
-                var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            using var response = await this.InternalMakeRequestAsync(
+                this.DefaultTimeout,
+                HttpCompletionOption.ResponseContentRead,
+                method,
+                path,
+                queryString,
+                headers,
+                content,
+                cancellationToken);
 
-                var apiResponse = new RegistryApiResponse<string>(
-                    response.StatusCode,
-                    responseBody,
-                    response.Headers);
+            var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-                this.HandleIfErrorResponse(apiResponse);
+            var apiResponse = new RegistryApiResponse<string>(
+                response.StatusCode,
+                responseBody,
+                response.Headers);
 
-                return apiResponse;
-            }
+            this.HandleIfErrorResponse(apiResponse);
+
+            return apiResponse;
         }
 
         internal async Task<RegistryApiResponse<string>> MakeRequestNotErrorAsync(
@@ -186,25 +185,24 @@ namespace Docker.Registry.DotNet.Registry
             //    method,
             //    queryString?.GetQueryString());
 
-            using (var response = await this.InternalMakeRequestAsync(
-                       this.DefaultTimeout,
-                       HttpCompletionOption.ResponseContentRead,
-                       method,
-                       path,
-                       queryString,
-                       headers,
-                       content,
-                       cancellationToken))
-            {
-                var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            using var response = await this.InternalMakeRequestAsync(
+                this.DefaultTimeout,
+                HttpCompletionOption.ResponseContentRead,
+                method,
+                path,
+                queryString,
+                headers,
+                content,
+                cancellationToken);
 
-                var apiResponse = new RegistryApiResponse<string>(
-                    response.StatusCode,
-                    responseBody,
-                    response.Headers);
+            var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-                return apiResponse;
-            }
+            var apiResponse = new RegistryApiResponse<string>(
+                response.StatusCode,
+                responseBody,
+                response.Headers);
+
+            return apiResponse;
         }
 
         internal async Task<RegistryApiResponse<Stream>> MakeRequestForStreamedResponseAsync(
@@ -251,8 +249,7 @@ namespace Docker.Registry.DotNet.Registry
 
             if (timeout != InfiniteTimeout)
             {
-                var timeoutTokenSource =
-                    CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                var timeoutTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
                 timeoutTokenSource.CancelAfter(timeout);
                 cancellationToken = timeoutTokenSource.Token;
             }
@@ -264,20 +261,19 @@ namespace Docker.Registry.DotNet.Registry
                 completionOption,
                 cancellationToken);
 
-            if (response.StatusCode == HttpStatusCode.Unauthorized)
-            {
-                //Prepare another request (we can't reuse the same request)
-                var request2 = this.PrepareRequest(method, path, queryString, headers, content);
+            if (response.StatusCode != HttpStatusCode.Unauthorized) return response;
 
-                //Authenticate given the challenge
-                await this._authenticationProvider.AuthenticateAsync(request2, response);
+            //Prepare another request (we can't reuse the same request)
+            var request2 = this.PrepareRequest(method, path, queryString, headers, content);
 
-                //Send it again
-                response = await this._client.SendAsync(
-                    request2,
-                    completionOption,
-                    cancellationToken);
-            }
+            //Authenticate given the challenge
+            await this._authenticationProvider.AuthenticateAsync(request2, response);
+
+            //Send it again
+            response = await this._client.SendAsync(
+                request2,
+                completionOption,
+                cancellationToken);
 
             return response;
         }
@@ -288,8 +284,7 @@ namespace Docker.Registry.DotNet.Registry
             foreach (var handler in this._errorHandlers) handler(response);
 
             // No custom handler was fired. Default the response for generic success/failures.
-            if (response.StatusCode < HttpStatusCode.OK
-                || response.StatusCode >= HttpStatusCode.BadRequest)
+            if (response.StatusCode is < HttpStatusCode.OK or >= HttpStatusCode.BadRequest)
                 throw new RegistryApiException<string>(response);
         }
 
@@ -299,8 +294,7 @@ namespace Docker.Registry.DotNet.Registry
             foreach (var handler in this._errorHandlers) handler(response);
 
             // No custom handler was fired. Default the response for generic success/failures.
-            if (response.StatusCode < HttpStatusCode.OK
-                || response.StatusCode >= HttpStatusCode.BadRequest)
+            if (response.StatusCode is < HttpStatusCode.OK or >= HttpStatusCode.BadRequest)
                 throw new RegistryApiException(response);
         }
 

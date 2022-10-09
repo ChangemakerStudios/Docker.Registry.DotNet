@@ -16,6 +16,8 @@ using DockerExplorer.Extensions;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 
+using Serilog;
+
 namespace DockerRegistryExplorer.ViewModel
 {
     public class RepositoriesViewModel : ViewModelBase
@@ -67,55 +69,54 @@ namespace DockerRegistryExplorer.ViewModel
 
         private void LoadAllRepositories()
         {
-            if (!this.Executor.IsBusy)
-                this.Executor.ExecuteAsync(
-                    async () =>
-                    {
-                        var catalog =
-                            await this._registryClient.Catalog.GetCatalogAsync(
-                                new CatalogParameters());
+            if (this.Executor.IsBusy) return;
 
-                        var repositories = catalog.Repositories
-                            .Select(
-                                r => this._lifetimeScope.Resolve<RepositoryViewModel>(
-                                    new NamedParameter("name", r),
-                                    new TypedParameter(typeof(RegistryViewModel), this._parent)
-                                ))
-                            .OrderBy(e => e.Name);
+            this.Executor.ExecuteAsync(this.GetCatalog).IgnoreAsync();
+        }
 
-                        this.Repositories =
-                            new ObservableCollection<RepositoryViewModel>(repositories);
+        private async Task GetCatalog()
+        {
+            var catalog =
+                await this._registryClient.Catalog.GetCatalogAsync(new CatalogParameters());
 
-                        Console.WriteLine("Done");
-                    }).IgnoreAsync();
+            var repositories = catalog.Repositories.Select(
+                    r => this._lifetimeScope.Resolve<RepositoryViewModel>(
+                        new NamedParameter("name", r),
+                        new TypedParameter(typeof(RegistryViewModel), this._parent)))
+                .OrderBy(e => e.Name)
+                .ToList();
+
+            this.Repositories = new ObservableCollection<RepositoryViewModel>(repositories);
+
+            Log.Debug("Done Getting Catalog {@Repositories}", repositories);
         }
 
         private void LoadRepository()
         {
-            if (!this.Executor.IsBusy)
-                this.Executor.ExecuteAsync(
-                    () =>
-                    {
-                        string name = null;
+            if (this.Executor.IsBusy) return;
 
-                        this._textEditService.EditText(
-                            "",
-                            "Repository name",
-                            "Add Repository",
-                            s => name = s);
+            this.Executor.ExecuteAsync(this.LoadRepositoryInternal).IgnoreAsync();
+        }
 
-                        if (!string.IsNullOrEmpty(name))
-                        {
-                            var repository = this._lifetimeScope.Resolve<RepositoryViewModel>(
-                                new NamedParameter("name", name),
-                                new TypedParameter(typeof(RegistryViewModel), this._parent)
-                            );
+        private Task LoadRepositoryInternal()
+        {
+            string name = null;
 
-                            this.Repositories.Add(repository);
-                        }
+            this._textEditService.EditText(
+                "",
+                "Repository name",
+                "Add Repository",
+                s => name = s);
 
-                        return Task.CompletedTask;
-                    }).IgnoreAsync();
+            if (!string.IsNullOrEmpty(name))
+            {
+                var repository = this._lifetimeScope.Resolve<RepositoryViewModel>(new NamedParameter("name", name),
+                    new TypedParameter(typeof(RegistryViewModel), this._parent));
+
+                this.Repositories.Add(repository);
+            }
+
+            return Task.CompletedTask;
         }
 
         public void Refresh()

@@ -7,7 +7,7 @@
         xmlns:viewModel="clr-namespace:DockerRegistryExplorer.ViewModel"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance viewModel:TextDialogViewModel}"
-        Title="{Binding Path=Title}" Height="450" Width="800">
+        Title="{Binding Path=Title}" Height="450" Width="800" FontSize="14">
     <Grid>
         <TextBox AcceptsReturn="True" AcceptsTab="True" VerticalScrollBarVisibility="Visible" Text="{Binding Path=Text, Mode=OneWay}" FontFamily="Courier New" FontSize="12" IsReadOnly="True">
 

@@ -106,10 +106,12 @@ namespace DockerRegistryExplorer.ViewModel
                     var result = this._fileDialogService.ShowSaveFileDialog();
 
                     if (result != null)
+                    {
                         using (var targetStream = File.Create(result.FileName))
                         {
-                            stream.CopyTo(targetStream);
+                            await stream.CopyToAsync(targetStream);
                         }
+                    }
                 }
 
                 this._messageBoxService.Show("Layer saved", "Complete");

@@ -9,7 +9,7 @@
         xmlns:viewModel="clr-namespace:DockerRegistryExplorer.ViewModel"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance viewModel:ManifestDialogViewModel}"
-        Title="{Binding Path=Title}" Height="450" Width="800">
+        Title="{Binding Path=Title}" Height="450" Width="800" FontSize="14">
 
     <i:Interaction.Behaviors>
         <behaviors:CloseableBehavior/>

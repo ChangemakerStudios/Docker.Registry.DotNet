@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 using Autofac;
@@ -29,10 +30,8 @@ namespace DockerRegistryExplorer.ViewModel
             ILifetimeScope lifetimeScope)
         {
             this.Parent = parent ?? throw new ArgumentNullException(nameof(parent));
-            this._registryClient =
-                registryClient ?? throw new ArgumentNullException(nameof(registryClient));
-            this._lifetimeScope =
-                lifetimeScope ?? throw new ArgumentNullException(nameof(lifetimeScope));
+            this._registryClient = registryClient ?? throw new ArgumentNullException(nameof(registryClient));
+            this._lifetimeScope = lifetimeScope ?? throw new ArgumentNullException(nameof(lifetimeScope));
             this.Name = name;
 
             this.Refresh();
@@ -60,26 +59,26 @@ namespace DockerRegistryExplorer.ViewModel
 
         public void Refresh()
         {
-            if (this.CanRefresh())
-                this.Executor.ExecuteAsync(
-                    async () =>
-                    {
-                        var tags = await this._registryClient.Tags.ListImageTagsAsync(
-                            this.Name,
-                            new ListImageTagsParameters());
+            if (!this.CanRefresh()) return;
 
-                        if (tags.Tags == null) this.Tags = new TagViewModel[] { };
-                        else
-                            this.Tags = tags.Tags
-                                .Select(
-                                    t => this._lifetimeScope.Resolve<TagViewModel>(
-                                        new NamedParameter("repository", this.Name),
-                                        new NamedParameter("tag", t),
-                                        new TypedParameter(this.GetType(), this)
-                                    ))
-                                .OrderByDescending(t => t.Tag)
-                                .ToArray();
-                    }).IgnoreAsync();
+            this.Executor.ExecuteAsync(this.ListImagesTags).IgnoreAsync();
+        }
+
+        private async Task ListImagesTags()
+        {
+            var tags = await this._registryClient.Tags.ListImageTagsAsync(
+                this.Name,
+                new ListImageTagsParameters());
+
+            if (tags.Tags == null) this.Tags = new TagViewModel[] { };
+            else
+                this.Tags = tags.Tags.Select(
+                        t => this._lifetimeScope.Resolve<TagViewModel>(
+                            new NamedParameter("repository", this.Name),
+                            new NamedParameter("tag", t),
+                            new TypedParameter(this.GetType(), this)))
+                    .OrderByDescending(t => t.Tag)
+                    .ToArray();
         }
 
         private bool CanRefresh()

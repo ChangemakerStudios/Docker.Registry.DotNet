@@ -1,4 +1,6 @@
-﻿namespace DockerRegistryExplorer
+﻿using Serilog;
+
+namespace DockerRegistryExplorer
 {
     using Autofac;
     using Cas.Common.WPF;
@@ -32,6 +34,20 @@
             builder.RegisterType<FileDialogService>().As<IFileDialogService>().SingleInstance();
             builder.RegisterType<TextEditService>().As<ITextEditService>().SingleInstance();
             builder.RegisterType<ViewService>().As<IViewService>().SingleInstance();
+
+            builder.Register(
+                    s =>
+                    {
+                        Log.Logger = new LoggerConfiguration().MinimumLevel.Verbose().WriteTo
+                            .Console()
+                            .WriteTo
+                            .Debug().Enrich.FromLogContext().CreateLogger();
+
+                        Log.Information("Started Up");
+
+                        return Log.Logger;
+                    }).As<ILogger>().SingleInstance()
+                .AutoActivate();
 
             return builder.Build();
         }

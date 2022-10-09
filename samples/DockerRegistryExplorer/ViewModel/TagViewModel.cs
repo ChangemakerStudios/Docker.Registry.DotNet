@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -67,7 +68,9 @@ namespace DockerRegistryExplorer.ViewModel
 
         private void CopyTag()
         {
-            var uri = new Uri(this._parent.Parent.Url);
+            var parentUrl = this._parent.Parent.Url.Replace("127.0.0.1", "localhost");
+
+            var uri = new Uri(parentUrl);
 
             var hostname = uri.Host;
 
@@ -84,29 +87,29 @@ namespace DockerRegistryExplorer.ViewModel
                     MessageBoxButton.YesNo) ==
                 MessageBoxResult.Yes)
             {
-                var ex = await this.Executor.ExecuteAsync(
-                    async () =>
-                    {
-                        //We need to get the digest of the manifest
-                        var manifest =
-                            await this._registryClient.Manifest.GetManifestAsync(
-                                this.Repository,
-                                this.Tag);
-
-                        var digest = manifest.DockerContentDigest;
-
-                        if (string.IsNullOrWhiteSpace(digest))
-                            this._messageBoxService.Show("Unable to find digest.");
-                        else
-                            await this._registryClient.Manifest.DeleteManifestAsync(
-                                this.Repository,
-                                digest);
-                    });
+                var ex = await this.Executor.ExecuteAsync(this.GetManifestInternal);
 
                 if (ex == null)
                     //Refresh
                     this._parent.Refresh();
             }
+        }
+
+        private async Task GetManifestInternal()
+        {
+            //We need to get the digest of the manifest
+            var manifest = await this._registryClient.Manifest.GetManifestAsync(
+                this.Repository,
+                this.Tag);
+
+            var digest = manifest.DockerContentDigest;
+
+            if (string.IsNullOrWhiteSpace(digest))
+                this._messageBoxService.Show("Unable to find digest.");
+            else
+                await this._registryClient.Manifest.DeleteManifestAsync(
+                    this.Repository,
+                    digest);
         }
 
         private bool CanDelete()
@@ -161,13 +164,7 @@ namespace DockerRegistryExplorer.ViewModel
             }
             else
             {
-                var manifest = result.Manifest as ImageManifest2_2;
-
-                if (manifest == null)
-                {
-                    this._messageBoxService.Show("Unsupported manifest type.");
-                }
-                else
+                if (result.Manifest is ImageManifest2_2 manifest)
                 {
                     var dialogViewModel = this._scope.Resolve<ManifestDialogViewModel>(
                         new TypedParameter(typeof(ImageManifest2_2), manifest),
@@ -175,6 +172,10 @@ namespace DockerRegistryExplorer.ViewModel
                     );
 
                     this._viewService.ShowDialog(dialogViewModel);
+                }
+                else
+                {
+                    this._messageBoxService.Show("Unsupported manifest type.");
                 }
             }
         }
