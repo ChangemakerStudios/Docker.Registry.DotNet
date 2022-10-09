@@ -54,15 +54,20 @@ namespace Docker.Registry.DotNet.Authentication
             //Get the bearer bits
             var bearerBits = AuthenticateParser.ParseTyped(header.Parameter);
 
+            string scope = null;
+
+            if (!string.IsNullOrWhiteSpace(bearerBits.Scope))
+            {
+                //Also include the repository(plugin) resource type to be able to access plugin repositories.
+                //See https://docs.docker.com/registry/spec/auth/scope/
+                scope = $"{bearerBits.Scope} {bearerBits.Scope?.Replace("repository:", "repository(plugin):")}";
+            }
+
             //Get the token
             var token = await this._client.GetTokenAsync(
                 bearerBits.Realm,
                 bearerBits.Service,
-                //Also include the repository(plugin) resource type to be able to access plugin repositories.
-                //See https://docs.docker.com/registry/spec/auth/scope/
-                bearerBits.Scope + " " + (bearerBits.Scope.Replace(
-                    "repository:",
-                    "repository(plugin):")),
+                scope,
                 this._username,
                 this._password);
 
