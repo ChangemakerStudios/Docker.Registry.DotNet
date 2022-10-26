@@ -1,4 +1,4 @@
-# <img src="https://github.com/ChangemakerStudios/Docker.Registry.DotNet/raw/master/assets/docker_registry_dotnet.png" width="24" height="24" /> Docker.Registry.DotNet
+# ![docker icon](https://raw.githubusercontent.com/ChangemakerStudios/Docker.Registry.DotNet/develop/assets/docker_registry_dotnet-24p.png) Docker.Registry.DotNet
 
 [![NuGet version](https://badge.fury.io/nu/Docker.Registry.DotNet.svg)](https://badge.fury.io/nu/Docker.Registry.DotNet)
 [![Build and Push to Nuget](https://github.com/ChangemakerStudios/Docker.Registry.DotNet/actions/workflows/publish.yml/badge.svg)](https://github.com/ChangemakerStudios/Docker.Registry.DotNet/actions/workflows/publish.yml)
@@ -26,3 +26,10 @@ using (var client = configuration.CreateClient())
     await client.System.PingAsync();
 }
 ```
+
+# Changelog
+
+### v1.1.33
+* Added Basic Authentication (thanks [Zguy](https://github.com/Zguy)).
+* Fixed issue with operational parameters (thanks [lostllama](https://github.com/lostllama)).
+* Fixed issue with large manifest layers (thanks [msvprogs](https://github.com/msvprogs)).

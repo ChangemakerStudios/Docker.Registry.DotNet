@@ -20,6 +20,7 @@ using JetBrains.Annotations;
 
 namespace Docker.Registry.DotNet.Endpoints
 {
+    [PublicAPI]
     public interface ISystemOperations
     {
         [PublicAPI]

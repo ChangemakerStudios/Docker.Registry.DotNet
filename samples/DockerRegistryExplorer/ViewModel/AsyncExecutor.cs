@@ -1,4 +1,6 @@
-﻿namespace DockerRegistryExplorer.ViewModel
+﻿using Serilog;
+
+namespace DockerRegistryExplorer.ViewModel
 {
     using System;
     using System.Threading.Tasks;
@@ -33,7 +35,7 @@
 
                 return null;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (LogError(ex))
             {
                 _messageBoxService.Show(ex.Message, "Error");
 
@@ -45,6 +47,13 @@
 
                 CommandManager.InvalidateRequerySuggested();
             }
+        }
+
+        private bool LogError(Exception ex)
+        {
+            Log.Error(ex, "Failure Executing Task");
+
+            return true;
         }
     }
 }

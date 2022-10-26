@@ -1,4 +1,6 @@
-﻿namespace DockerRegistryExplorer.ViewModel
+﻿using Docker.Registry.DotNet.Registry;
+
+namespace DockerRegistryExplorer.ViewModel
 {
     using System;
     using Cas.Common.WPF.Interfaces;
@@ -26,7 +28,7 @@
 
         public string MediaType => _model.MediaType;
 
-        public int Size => _model.Size;
+        public long Size => _model.Size;
 
         public string Digest => _model.Digest;
     }

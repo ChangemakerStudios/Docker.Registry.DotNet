@@ -1,95 +1,94 @@
-﻿namespace DockerRegistryExplorer.ViewModel
-{
-    using System;
-    using Docker.Registry.DotNet;
-    using Docker.Registry.DotNet.Authentication;
+﻿using System.Threading.Tasks;
 
+using Docker.Registry.DotNet;
+using Docker.Registry.DotNet.Authentication;
+using Docker.Registry.DotNet.Registry;
+
+namespace DockerRegistryExplorer.ViewModel
+{
     public class ConnectViewModel : DialogViewModelBase
     {
         private const string DefaultEndpoint = "registry.hub.docker.com";
 
-        private bool _isAnonymous = true;
-        
-        
         private string _endpoint = DefaultEndpoint;
-        private string _username;
+
+        private bool _isAnonymous = true;
+
         private string _password;
+
+        private string _username;
 
         public AsyncExecutor Executor { get; } = new AsyncExecutor();
 
-        protected override async void Ok()
-        {
-            var ex = await Executor.ExecuteAsync(async () =>
-            {
-                var configuration = new RegistryClientConfiguration(Endpoint);
-
-                AuthenticationProvider authenticationProvider;
-
-                if (IsAnonymous)
-                {
-                    authenticationProvider = new AnonymousOAuthAuthenticationProvider();
-                }
-                else
-                {
-                    authenticationProvider = new PasswordOAuthAuthenticationProvider(Username, Password);
-                }
-
-                var client = configuration.CreateClient(authenticationProvider);
-
-                await client.System.PingAsync();
-
-                RegistryClient = client;
-            });
-
-            if (ex == null)
-            {
-                base.Ok();
-            }
-        }
-
         public bool IsAnonymous
         {
-            get { return _isAnonymous; }
+            get => this._isAnonymous;
             set
             {
-                _isAnonymous = value; 
-                RaisePropertyChanged();
+                this._isAnonymous = value;
+                this.RaisePropertyChanged();
             }
         }
 
         public string Endpoint
         {
-            get { return _endpoint; }
+            get => this._endpoint;
             set
             {
-                _endpoint = value; 
-                RaisePropertyChanged();
+                this._endpoint = value;
+                this.RaisePropertyChanged();
             }
         }
 
         public string Username
         {
-            get { return _username; }
+            get => this._username;
             set
             {
-                _username = value; 
-                RaisePropertyChanged();
+                this._username = value;
+                this.RaisePropertyChanged();
             }
         }
 
         public string Password
         {
-            get { return _password; }
+            get => this._password;
             set
             {
-                _password = value; 
-                RaisePropertyChanged();
+                this._password = value;
+                this.RaisePropertyChanged();
             }
         }
 
         /// <summary>
-        /// If Ok is pressed, this will have the registry client
+        ///     If Ok is pressed, this will have the registry client
         /// </summary>
-        public IRegistryClient RegistryClient { get; private set; } 
+        public IRegistryClient RegistryClient { get; private set; }
+
+        protected override async void Ok()
+        {
+            var ex = await this.Executor.ExecuteAsync(this.Connect);
+
+            if (ex == null) base.Ok();
+        }
+
+        private async Task Connect()
+        {
+            var configuration = new RegistryClientConfiguration(this.Endpoint);
+
+            AuthenticationProvider authenticationProvider;
+
+            if (this.IsAnonymous)
+                authenticationProvider = new AnonymousOAuthAuthenticationProvider();
+            else
+                authenticationProvider =
+                    new PasswordOAuthAuthenticationProvider(this.Username, this.Password);
+
+            var client = configuration.CreateClient(authenticationProvider);
+
+            await client.System.PingAsync();
+
+            this.RegistryClient = client;
+        }
     }
 }

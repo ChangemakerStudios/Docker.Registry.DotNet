@@ -33,21 +33,22 @@
         {
             var viewModel = _lifetimeScope.Resolve<ConnectViewModel>();
 
-            if (_viewService.ShowDialog(viewModel) == true)
+            if (this._viewService.ShowDialog(viewModel) ?? false)
             {
                 var registryClient = viewModel.RegistryClient;
 
-                var childScope = _lifetimeScope.BeginLifetimeScope(builder =>
-                {
-                    builder.RegisterInstance(registryClient);
-                });
+                var childScope = this._lifetimeScope.BeginLifetimeScope(
+                    builder =>
+                    {
+                        builder.RegisterInstance(registryClient);
+                    });
 
                 var registry = childScope.Resolve<RegistryViewModel>
                 (
                     new NamedParameter("url", viewModel.Endpoint)
                 );
 
-                _registries.Add(registry);
+                this._registries.Add(registry);
             }
         }
 
