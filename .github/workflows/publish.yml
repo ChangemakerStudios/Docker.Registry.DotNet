@@ -32,7 +32,7 @@ jobs:
         useConfigFile: true
         
     - name: Run Tests
-      run: dotnet test --logger trx --collect:"XPlat Code Coverage"
+      run: dotnet test test/Docker.Registry.DotNet.Tests/Docker.Registry.DotNet.Tests.csproj --logger trx --collect:"XPlat Code Coverage"
       
     - name: Combine Coverage Reports # This is because one report is produced per project, and we want one result for all of them.
       uses: danielpalme/ReportGenerator-GitHub-Action@5.2.4
