@@ -2,9 +2,8 @@
 {
     using System;
     using Cas.Common.WPF.Behaviors;
-    using GalaSoft.MvvmLight;
 
-    public class CloseableViewModelBase : ViewModelBase, ICloseableViewModel
+    public class CloseableViewModelBase : ObservableObject, ICloseableViewModel
     {
         public virtual bool CanClose()
         {

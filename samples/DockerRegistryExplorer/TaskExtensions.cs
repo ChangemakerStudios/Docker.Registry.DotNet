@@ -1,11 +1,8 @@
-﻿namespace DockerExplorer.Extensions
-{
-    using System.Threading.Tasks;
+﻿namespace DockerRegistryExplorer;
 
-    public static class TaskExtensions
+public static class TaskExtensions
+{
+    public static void IgnoreAsync(this Task task)
     {
-        public static void IgnoreAsync(this Task task)
-        {
-        }
     }
 }

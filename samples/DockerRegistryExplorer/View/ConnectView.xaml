@@ -4,13 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DockerRegistryExplorer.View"
-             xmlns:controls="clr-namespace:DockerExplorer.Controls"
              xmlns:viewModel="clr-namespace:DockerRegistryExplorer.ViewModel"
              xmlns:controls1="clr-namespace:Cas.Common.WPF.Controls;assembly=Cas.Common.WPF"
              xmlns:converters="clr-namespace:DockerRegistryExplorer.Converters"
              xmlns:converters1="clr-namespace:Cas.Common.WPF.Converters;assembly=Cas.Common.WPF"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:behaviors="clr-namespace:Cas.Common.WPF.Behaviors;assembly=Cas.Common.WPF"
+             xmlns:Controls="clr-namespace:DockerRegistryExplorer.Controls"
              mc:Ignorable="d" 
              ResizeMode="NoResize"
              SizeToContent="Height"
@@ -108,7 +108,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <controls:BusyIndicator Grid.Column="1" VerticalAlignment="Center" Margin="2" Visibility="{Binding Path=Executor.IsBusy, Converter={StaticResource HiddenWhenFalseConverter}}"/>
+            <Controls:BusyIndicator Grid.Column="1" VerticalAlignment="Center" Margin="2" Visibility="{Binding Path=Executor.IsBusy, Converter={StaticResource HiddenWhenFalseConverter}}"/>
             <Button Grid.Column="2" MinWidth="100" Margin="4" IsDefault="True" Command="{Binding OkCommand}" Content="Connect"/>
             <Button Grid.Column="3" MinWidth="100" Margin="4" IsCancel="True">_Cancel</Button>
         </Grid>

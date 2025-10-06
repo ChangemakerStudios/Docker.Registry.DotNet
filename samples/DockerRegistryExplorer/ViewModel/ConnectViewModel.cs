@@ -1,14 +1,13 @@
 ﻿using System.Threading.Tasks;
 
 using Docker.Registry.DotNet;
-using Docker.Registry.DotNet.Authentication;
-using Docker.Registry.DotNet.Registry;
+using Docker.Registry.DotNet.Application.Authentication;
 
 namespace DockerRegistryExplorer.ViewModel
 {
     public class ConnectViewModel : DialogViewModelBase
     {
-        private const string DefaultEndpoint = "registry.hub.docker.com";
+        private const string DefaultEndpoint = "https://registry-1.docker.io";
 
         private string _endpoint = DefaultEndpoint;
 
@@ -26,7 +25,7 @@ namespace DockerRegistryExplorer.ViewModel
             set
             {
                 this._isAnonymous = value;
-                this.RaisePropertyChanged();
+                this.OnPropertyChanged();
             }
         }
 
@@ -36,7 +35,7 @@ namespace DockerRegistryExplorer.ViewModel
             set
             {
                 this._endpoint = value;
-                this.RaisePropertyChanged();
+                this.OnPropertyChanged();
             }
         }
 
@@ -46,7 +45,7 @@ namespace DockerRegistryExplorer.ViewModel
             set
             {
                 this._username = value;
-                this.RaisePropertyChanged();
+                this.OnPropertyChanged();
             }
         }
 
@@ -56,7 +55,7 @@ namespace DockerRegistryExplorer.ViewModel
             set
             {
                 this._password = value;
-                this.RaisePropertyChanged();
+                this.OnPropertyChanged();
             }
         }
 
@@ -76,17 +75,12 @@ namespace DockerRegistryExplorer.ViewModel
         {
             var configuration = new RegistryClientConfiguration(this.Endpoint);
 
-            AuthenticationProvider authenticationProvider;
+            if (!this.IsAnonymous && this.Username != null && this.Password != null)
+                configuration.UsePasswordOAuthAuthentication(this.Username, this.Password);
 
-            if (this.IsAnonymous)
-                authenticationProvider = new AnonymousOAuthAuthenticationProvider();
-            else
-                authenticationProvider =
-                    new PasswordOAuthAuthenticationProvider(this.Username, this.Password);
+            var client = configuration.CreateClient();
 
-            var client = configuration.CreateClient(authenticationProvider);
-
-            await client.System.PingAsync();
+            await client.System.Ping();
 
             this.RegistryClient = client;
         }

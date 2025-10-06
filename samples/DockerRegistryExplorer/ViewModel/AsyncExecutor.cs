@@ -4,12 +4,10 @@ namespace DockerRegistryExplorer.ViewModel
 {
     using System;
     using System.Threading.Tasks;
-    using System.Windows.Input;
-    using Cas.Common.WPF;
-    using Cas.Common.WPF.Interfaces;
-    using GalaSoft.MvvmLight;
 
-    public class AsyncExecutor : ViewModelBase
+    using Cas.Common.WPF;
+
+    public class AsyncExecutor : ObservableObject
     {
         private bool _isBusy;
 
@@ -21,7 +19,7 @@ namespace DockerRegistryExplorer.ViewModel
             private set
             {
                 _isBusy = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
             }
         }
 
