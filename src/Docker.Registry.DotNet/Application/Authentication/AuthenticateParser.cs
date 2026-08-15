@@ -17,7 +17,7 @@ namespace Docker.Registry.DotNet.Application.Authentication;
 
 internal static class AuthenticateParser
 {
-    public static IDictionary<string, string> Parse(string value)
+    public static IDictionary<string, string?> Parse(string value)
     {
         //https://stackoverflow.com/questions/45516717/extracting-and-parsing-the-www-authenticate-header-from-httpresponsemessage-in/45516809#45516809            
         return SplitWWWAuthenticateHeader(value).ToDictionary(GetKey, GetValue);
@@ -27,9 +27,9 @@ internal static class AuthenticateParser
     {
         var builder = new StringBuilder();
         var inQuotes = false;
-        for (var i = 0; i < value.Length; i++)
+        
+        foreach (var charI in value)
         {
-            var charI = value[i];
             switch (charI)
             {
                 case '\"':

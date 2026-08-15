@@ -1,131 +1,116 @@
-﻿using System;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Input;
 
-using Autofac;
-
-using Cas.Common.WPF.Interfaces;
-
-using Docker.Registry.DotNet.Models;
-using Docker.Registry.DotNet.Registry;
-
-using DockerExplorer.Extensions;
-
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.CommandWpf;
+using Docker.Registry.DotNet.Domain.Catalogs;
 
 using Serilog;
 
-namespace DockerRegistryExplorer.ViewModel
+namespace DockerRegistryExplorer.ViewModel;
+
+public class RepositoriesViewModel : ObservableObject
 {
-    public class RepositoriesViewModel : ViewModelBase
+    private readonly ILifetimeScope _lifetimeScope;
+
+    private readonly RegistryViewModel _parent;
+
+    private readonly IRegistryClient _registryClient;
+
+    private readonly ITextEditService _textEditService;
+
+    private ObservableCollection<RepositoryViewModel> _repositories = new();
+
+    public RepositoriesViewModel(
+        IRegistryClient registryClient,
+        RegistryViewModel parent,
+        ILifetimeScope lifetimeScope,
+        ITextEditService textEditService)
     {
-        private readonly ILifetimeScope _lifetimeScope;
+        _registryClient =
+            registryClient ?? throw new ArgumentNullException(nameof(registryClient));
+        _parent = parent ?? throw new ArgumentNullException(nameof(parent));
+        _lifetimeScope =
+            lifetimeScope ?? throw new ArgumentNullException(nameof(lifetimeScope));
+        _textEditService = textEditService
+                           ?? throw new ArgumentNullException(nameof(textEditService));
 
-        private readonly RegistryViewModel _parent;
+        LoadAllRepositoriesCommand = new RelayCommand(LoadAllRepositories);
+        LoadRepositoryCommand = new RelayCommand(LoadRepository);
+    }
 
-        private readonly IRegistryClient _registryClient;
+    public ICommand LoadAllRepositoriesCommand { get; }
 
-        private readonly ITextEditService _textEditService;
+    public ICommand LoadRepositoryCommand { get; }
 
-        private ObservableCollection<RepositoryViewModel> _repositories =
-            new ObservableCollection<RepositoryViewModel>();
+    public AsyncExecutor Executor { get; } = new();
 
-        public RepositoriesViewModel(
-            IRegistryClient registryClient,
-            RegistryViewModel parent,
-            ILifetimeScope lifetimeScope,
-            ITextEditService textEditService)
+    public ObservableCollection<RepositoryViewModel> Repositories
+    {
+        get => _repositories;
+        private set
         {
-            this._registryClient =
-                registryClient ?? throw new ArgumentNullException(nameof(registryClient));
-            this._parent = parent ?? throw new ArgumentNullException(nameof(parent));
-            this._lifetimeScope =
-                lifetimeScope ?? throw new ArgumentNullException(nameof(lifetimeScope));
-            this._textEditService = textEditService
-                                    ?? throw new ArgumentNullException(nameof(textEditService));
+            _repositories = value;
+            OnPropertyChanged();
+        }
+    }
 
-            this.LoadAllRepositoriesCommand = new RelayCommand(this.LoadAllRepositories);
-            this.LoadRepositoryCommand = new RelayCommand(this.LoadRepository);
+    private void LoadAllRepositories()
+    {
+        if (Executor.IsBusy) return;
+
+        Executor.ExecuteAsync(GetCatalog).IgnoreAsync();
+    }
+
+    private async Task GetCatalog()
+    {
+        var catalog =
+            await _registryClient.Catalog.GetCatalog(new CatalogParameters());
+
+        var repositories = (catalog.Repositories ?? [])
+            .Select(r => _lifetimeScope.Resolve<RepositoryViewModel>(
+                new NamedParameter("name", r),
+                new TypedParameter(typeof(RegistryViewModel), _parent)))
+            .OrderBy(e => e.Name)
+            .ToList();
+
+        Repositories = new ObservableCollection<RepositoryViewModel>(repositories);
+
+        Log.Debug("Done Getting Catalog {@Repositories}", repositories);
+    }
+
+    private void LoadRepository()
+    {
+        if (Executor.IsBusy) return;
+
+        Executor.ExecuteAsync(LoadRepositoryInternal).IgnoreAsync();
+    }
+
+    private Task LoadRepositoryInternal()
+    {
+        string? name = null;
+
+        _textEditService.EditText(
+            "",
+            "Repository name",
+            "Add Repository",
+            s => name = s);
+
+        if (!string.IsNullOrEmpty(name))
+        {
+            var repository = _lifetimeScope.Resolve<RepositoryViewModel>(new NamedParameter("name", name),
+                new TypedParameter(typeof(RegistryViewModel), _parent));
+
+            Repositories.Add(repository);
         }
 
-        public ICommand LoadAllRepositoriesCommand { get; }
+        return Task.CompletedTask;
+    }
 
-        public ICommand LoadRepositoryCommand { get; }
+    public void Refresh()
+    {
+        foreach (var repository in Repositories) repository.Refresh();
+    }
 
-        public AsyncExecutor Executor { get; } = new AsyncExecutor();
-
-        public ObservableCollection<RepositoryViewModel> Repositories
-        {
-            get => this._repositories;
-            private set
-            {
-                this._repositories = value;
-                this.RaisePropertyChanged();
-            }
-        }
-
-        private void LoadAllRepositories()
-        {
-            if (this.Executor.IsBusy) return;
-
-            this.Executor.ExecuteAsync(this.GetCatalog).IgnoreAsync();
-        }
-
-        private async Task GetCatalog()
-        {
-            var catalog =
-                await this._registryClient.Catalog.GetCatalogAsync(new CatalogParameters());
-
-            var repositories = catalog.Repositories.Select(
-                    r => this._lifetimeScope.Resolve<RepositoryViewModel>(
-                        new NamedParameter("name", r),
-                        new TypedParameter(typeof(RegistryViewModel), this._parent)))
-                .OrderBy(e => e.Name)
-                .ToList();
-
-            this.Repositories = new ObservableCollection<RepositoryViewModel>(repositories);
-
-            Log.Debug("Done Getting Catalog {@Repositories}", repositories);
-        }
-
-        private void LoadRepository()
-        {
-            if (this.Executor.IsBusy) return;
-
-            this.Executor.ExecuteAsync(this.LoadRepositoryInternal).IgnoreAsync();
-        }
-
-        private Task LoadRepositoryInternal()
-        {
-            string name = null;
-
-            this._textEditService.EditText(
-                "",
-                "Repository name",
-                "Add Repository",
-                s => name = s);
-
-            if (!string.IsNullOrEmpty(name))
-            {
-                var repository = this._lifetimeScope.Resolve<RepositoryViewModel>(new NamedParameter("name", name),
-                    new TypedParameter(typeof(RegistryViewModel), this._parent));
-
-                this.Repositories.Add(repository);
-            }
-
-            return Task.CompletedTask;
-        }
-
-        public void Refresh()
-        {
-        }
-
-        private bool CanRefresh()
-        {
-            return !this.Executor.IsBusy;
-        }
+    private bool CanRefresh()
+    {
+        return !Executor.IsBusy;
     }
 }

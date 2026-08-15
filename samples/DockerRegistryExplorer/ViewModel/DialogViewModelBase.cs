@@ -1,25 +1,21 @@
-﻿namespace DockerRegistryExplorer.ViewModel
+﻿namespace DockerRegistryExplorer.ViewModel;
+
+public abstract class DialogViewModelBase : CloseableViewModelBase
 {
-    using System.Windows.Input;
-    using GalaSoft.MvvmLight.Command;
-
-    public abstract class DialogViewModelBase : CloseableViewModelBase
+    protected DialogViewModelBase()
     {
-        protected DialogViewModelBase()
-        {
-            OkCommand = new RelayCommand(Ok, CanOk);
-        }
+        OkCommand = new RelayCommand(Ok, CanOk);
+    }
 
-        public ICommand OkCommand { get; }
+    public ICommand OkCommand { get; }
 
-        protected virtual void Ok()
-        {
-            RaiseCloseEventArgs(true);
-        }
+    protected virtual void Ok()
+    {
+        RaiseCloseEventArgs(true);
+    }
 
-        protected virtual bool CanOk()
-        {
-            return true;
-        }
+    protected virtual bool CanOk()
+    {
+        return true;
     }
 }

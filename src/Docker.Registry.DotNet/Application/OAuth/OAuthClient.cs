@@ -22,7 +22,7 @@ internal class OAuthClient
     private static readonly HttpClient _client = new();
 
     private async Task<OAuthToken?> GetTokenInner(
-        string realm,
+        string? realm,
         string? service,
         string? scope,
         string? username,
@@ -52,7 +52,7 @@ internal class OAuthClient
             request = new HttpRequestMessage(HttpMethod.Post, realm)
             {
                 Content = new FormUrlEncodedContent(
-                    new Dictionary<string, string>
+                    new Dictionary<string, string?>
                     {
                         { "client_id", "Docker.Registry.DotNet" },
                         { "grant_type", "password" },
@@ -94,17 +94,17 @@ internal class OAuthClient
     }
 
     public Task<OAuthToken?> GetToken(
-        string realm,
-        string service,
-        string scope,
+        string? realm,
+        string? service,
+        string? scope,
         CancellationToken cancellationToken = default)
     {
         return this.GetTokenInner(realm, service, scope, null, null, cancellationToken);
     }
 
     public Task<OAuthToken?> GetToken(
-        string realm,
-        string service,
+        string? realm,
+        string? service,
         string? scope,
         string username,
         string password,

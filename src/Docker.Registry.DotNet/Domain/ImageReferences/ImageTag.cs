@@ -27,7 +27,7 @@ public record ImageTag
 
         if (errors.Any())
         {
-            throw new ArgumentException($"Invalid Image Reference: {errors.ToDelimitedString(", ")}", nameof(value));
+            throw new ArgumentException($"Invalid Image Tag: {errors.ToDelimitedString(", ")}", nameof(value));
         }
 
         this.Value = parsedTag;
@@ -94,7 +94,7 @@ public record ImageTag
         {
             yield return @$"Value ""{value}"" is invalid characters: ""{
                 invalidCharacters.Select(s => $"{s}").ToDelimitedString(",")
-            }"". Image References can only contain lowercase and uppercase letters, digits, underscores, periods, and hyphens.";
+            }"". Image Tags can only contain lowercase and uppercase letters, digits, underscores, periods, and hyphens.";
 
             yield break;
         }

@@ -1,4 +1,4 @@
-﻿//  Copyright 2017-2022 Rich Quackenbush, Jaben Cargman
+// Copyright 2017-2025 Rich Quackenbush, Jaben Cargman
 //  and Docker.Registry.DotNet Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,13 +13,14 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-namespace Docker.Registry.DotNet.Application.Authentication;
+global using System.Windows;
+global using System.Windows.Input;
 
-internal class ParsedAuthentication(string? realm, string? service, string? scope)
-{
-    public string? Realm { get; } = realm;
+global using Autofac;
 
-    public string? Service { get; } = service;
+global using Cas.Common.WPF.Interfaces;
 
-    public string? Scope { get; } = scope;
-}
+global using CommunityToolkit.Mvvm.ComponentModel;
+global using CommunityToolkit.Mvvm.Input;
+
+global using Docker.Registry.DotNet.Domain.Registry;

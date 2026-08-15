@@ -53,5 +53,5 @@ public class RegistryApiException<TBody> : RegistryApiException
         Body = response.Body;
     }
 
-    public TBody Body { get; }
+    public TBody? Body { get; }
 }

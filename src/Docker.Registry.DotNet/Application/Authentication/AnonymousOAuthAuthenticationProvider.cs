@@ -49,6 +49,11 @@ public class AnonymousOAuthAuthenticationProvider : AuthenticationProvider
             bearerBits.Service,
             bearerBits.Scope);
 
+        if (token?.Token == null)
+        {
+            throw new ArgumentNullException(nameof(token.Token), "Authorization token cannot be null");
+        }
+
         //Set the header
         request.Headers.Authorization = new AuthenticationHeaderValue(Schema, token.Token);
     }

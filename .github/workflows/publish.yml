@@ -2,40 +2,101 @@ name: Build and Push to Nuget
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+  issues: read
+  checks: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        dotnet-version: [8.x]
-        
+
     steps:
     - name: Checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
- 
+
     - name: Setup Dotnet
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: ${{ matrix.dotnet-version }}
+        dotnet-version: |
+          6.x
+          8.x
         
     - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v1.1.1
+      uses: gittools/actions/gitversion/setup@v4.1.0
       with:
-        versionSpec: '5.x'     
-        
+        versionSpec: '6.x'
+
     - name: GitVersion
       id: gitversion
-      uses: gittools/actions/gitversion/execute@v1.1.1
-      with:
-        useConfigFile: true
+      uses: gittools/actions/gitversion/execute@v4.1.0
         
+    - name: Run Tests
+      run: dotnet test test/Docker.Registry.DotNet.Tests/Docker.Registry.DotNet.Tests.csproj --logger trx --collect:"XPlat Code Coverage"
+      
+    - name: Combine Coverage Reports # This is because one report is produced per project, and we want one result for all of them.
+      uses: danielpalme/ReportGenerator-GitHub-Action@5.4.16
+      with:
+        reports: "**/*.cobertura.xml" # REQUIRED # The coverage reports that should be parsed (separated by semicolon). Globbing is supported.
+        targetdir: "${{ github.workspace }}" # REQUIRED # The directory where the generated report should be saved.
+        reporttypes: "Cobertura" # The output formats and scope (separated by semicolon) Values: Badges, Clover, Cobertura, CsvSummary, Html, Html_Dark, Html_Light, Html_BlueRed, HtmlChart, HtmlInline, HtmlInline_AzurePipelines, HtmlInline_AzurePipelines_Dark, HtmlInline_AzurePipelines_Light, HtmlSummary, JsonSummary, Latex, LatexSummary, lcov, MarkdownSummary, MarkdownSummaryGithub, MarkdownDeltaSummary, MHtml, PngChart, SonarQube, TeamCitySummary, TextSummary, TextDeltaSummary, Xml, XmlSummary
+        verbosity: "Info" # The verbosity level of the log messages. Values: Verbose, Info, Warning, Error, Off
+        title: "Code Coverage" # Optional title.
+        tag: "${{ github.run_number }}_${{ github.run_id }}" # Optional tag or build version.
+        customSettings: "" # Optional custom settings (separated by semicolon). See: https://github.com/danielpalme/ReportGenerator/wiki/Settings.
+        toolpath: "reportgeneratortool" # Default directory for installing the dotnet tool.
+
+    - name: Upload Combined Coverage XML
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage
+        path: ${{ github.workspace }}/Cobertura.xml
+        retention-days: 5
+
+    - name: Publish Code Coverage Report
+      uses: irongut/CodeCoverageSummary@v1.3.0
+      with:
+        filename: "Cobertura.xml"
+        badge: true
+        fail_below_min: false # just informative for now
+        format: markdown
+        hide_branch_rate: false
+        hide_complexity: false
+        indicators: true
+        output: both
+        thresholds: "10 30"
+
+    - name: Add Coverage PR Comment
+      uses: marocchino/sticky-pull-request-comment@v2
+      if: github.event_name == 'pull_request'
+      with:
+        recreate: true
+        path: code-coverage-results.md
+        
+    - name: Upload Test Result Files
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: ${{ github.workspace }}/**/TestResults/**/*
+        retention-days: 5
+
+    - name: Publish Test Results
+      uses: EnricoMi/publish-unit-test-result-action/linux@v2.20.0
+      if: always()
+      with:
+        files: "${{ github.workspace }}/**/*.trx" 
+    
     - name: Pack
-      run: dotnet pack src/Docker.Registry.DotNet -c Release -p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersion }} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
+      run: dotnet pack src/Docker.Registry.DotNet -c Release -p:PackageVersion=${{ steps.gitversion.outputs.semVer }} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
    
     - name: Publish
       if: github.event_name != 'pull_request' && (github.ref_name == 'master')  
       run: |
         dotnet nuget push **/*.nupkg --source 'https://api.nuget.org/v3/index.json' -k ${{ secrets.NUGETKEY }} --skip-duplicate
-        dotnet nuget push **/*.snupkg --source 'https://api.nuget.org/v3/index.json' -k ${{ secrets.NUGETKEY }} --skip-duplicate

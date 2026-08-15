@@ -19,14 +19,14 @@ public class GetImageManifestResult
 {
     internal GetImageManifestResult(string mediaType, ImageManifest manifest, string content)
     {
-            this.Manifest = manifest;
-            this.Content = content;
-            this.MediaType = mediaType;
-        }
+        this.Manifest = manifest;
+        this.Content = content;
+        this.MediaType = mediaType;
+    }
 
-    public string DockerContentDigest { get; internal set; }
+    public string? DockerContentDigest { get; internal set; }
 
-    public string Etag { get; internal set; }
+    public string? Etag { get; internal set; }
 
     public string MediaType { get; }
 

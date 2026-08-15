@@ -28,13 +28,10 @@ internal static class DictionaryExtensions
                         v => $"{Uri.EscapeUriString(pair.Key)}={Uri.EscapeDataString(v)}"))));
     }
 
-    public static TValue GetValueOrDefault<TKey, TValue>(
+    public static TValue? GetValueOrDefault<TKey, TValue>(
         this IDictionary<TKey, TValue> dict,
         TKey key)
     {
-        if (dict.TryGetValue(key, out var value))
-            return value;
-
-        return default;
+        return dict.TryGetValue(key, out var value) ? value : default;
     }
 }

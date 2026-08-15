@@ -59,6 +59,11 @@ public class PasswordOAuthAuthenticationProvider(string username, string passwor
             scope,
             username,
             password);
+        
+        if (token?.AccessToken == null)
+        {
+            throw new ArgumentNullException(nameof(token.AccessToken), "Authorization token cannot be null");
+        }
 
         //Set the header
         request.Headers.Authorization =

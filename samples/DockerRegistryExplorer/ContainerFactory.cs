@@ -1,55 +1,52 @@
-﻿using Serilog;
+﻿using Cas.Common.WPF;
 
-namespace DockerRegistryExplorer
+using DockerRegistryExplorer.View;
+using DockerRegistryExplorer.ViewModel;
+
+using Serilog;
+
+namespace DockerRegistryExplorer;
+
+public static class ContainerFactory
 {
-    using Autofac;
-    using Cas.Common.WPF;
-    using Cas.Common.WPF.Interfaces;
-    using View;
-    using ViewModel;
-
-    public static class ContainerFactory
+    public static IContainer Build()
     {
-        public static IContainer Build()
-        {
-            var builder = new ContainerBuilder();
-            
-            //view service registrations
-            builder.RegisterViewModel<MainViewModel, MainWindow>();
-            builder.RegisterViewModel<ConnectViewModel, ConnectView>();
-            builder.RegisterViewModel<TextDialogViewModel, TextDialogView>();
-            builder.RegisterViewModel<ManifestDialogViewModel, ManfiestDialogView>();
+        var builder = new ContainerBuilder();
 
-            //view models
-            builder.RegisterType<RegistryViewModel>();
-            builder.RegisterType<RepositoriesViewModel>();
-            builder.RegisterType<RepositoryViewModel>();
-            builder.RegisterType<TagViewModel>();
-            builder.RegisterType<TextDialogViewModel>();
-            builder.RegisterType<ManifestDialogViewModel>();
-            builder.RegisterType<ManifestLayerViewModel>();
+        //view service registrations
+        builder.RegisterViewModel<MainViewModel, MainWindow>();
+        builder.RegisterViewModel<ConnectViewModel, ConnectView>();
+        builder.RegisterViewModel<TextDialogViewModel, TextDialogView>();
+        builder.RegisterViewModel<ManifestDialogViewModel, ManfiestDialogView>();
 
-            //Services
-            builder.RegisterType<MessageBoxService>().As<IMessageBoxService>().SingleInstance();
-            builder.RegisterType<FileDialogService>().As<IFileDialogService>().SingleInstance();
-            builder.RegisterType<TextEditService>().As<ITextEditService>().SingleInstance();
-            builder.RegisterType<ViewService>().As<IViewService>().SingleInstance();
+        //view models
+        builder.RegisterType<RegistryViewModel>();
+        builder.RegisterType<RepositoriesViewModel>();
+        builder.RegisterType<RepositoryViewModel>();
+        builder.RegisterType<TagViewModel>();
+        builder.RegisterType<TextDialogViewModel>();
+        builder.RegisterType<ManifestDialogViewModel>();
+        builder.RegisterType<ManifestLayerViewModel>();
 
-            builder.Register(
-                    s =>
-                    {
-                        Log.Logger = new LoggerConfiguration().MinimumLevel.Verbose().WriteTo
-                            .Console()
-                            .WriteTo
-                            .Debug().Enrich.FromLogContext().CreateLogger();
+        //Services
+        builder.RegisterType<MessageBoxService>().As<IMessageBoxService>().SingleInstance();
+        builder.RegisterType<FileDialogService>().As<IFileDialogService>().SingleInstance();
+        builder.RegisterType<TextEditService>().As<ITextEditService>().SingleInstance();
+        builder.RegisterType<ViewService>().As<IViewService>().SingleInstance();
 
-                        Log.Information("Started Up");
+        builder.Register(s =>
+            {
+                Log.Logger = new LoggerConfiguration().MinimumLevel.Verbose().WriteTo
+                    .Console()
+                    .WriteTo
+                    .Debug().Enrich.FromLogContext().CreateLogger();
 
-                        return Log.Logger;
-                    }).As<ILogger>().SingleInstance()
-                .AutoActivate();
+                Log.Information("Started Up");
 
-            return builder.Build();
-        }
+                return Log.Logger;
+            }).As<ILogger>().SingleInstance()
+            .AutoActivate();
+
+        return builder.Build();
     }
 }
