@@ -6,13 +6,13 @@ This project follows [Gitflow](https://nvie.com/posts/a-successful-git-branching
 
 | Branch | Purpose |
 |---|---|
-| `master` | Production releases. Pushes here trigger NuGet publish. |
+| `master` | Production releases. Pushing a release tag triggers NuGet publish. |
 | `develop` | Integration branch for the next release. |
 | `feature/*` | Feature branches off `develop`. |
 | `fix/*` | Bug fix branches off `develop`. |
 | `release/*` | Release stabilization branches off `develop`. |
 
-> **Important:** Pull requests for features and fixes should target `develop`, not `master`. Any push to `master` (including a PR merge) triggers a NuGet publish attempt.
+> **Important:** Pull requests for features and fixes should target `develop`, not `master`. NuGet publishing is triggered by pushing a version tag (e.g. `2.1.0`), so an untagged push to `master` only builds and tests.
 
 ## Release Steps
 
@@ -55,7 +55,7 @@ git tag X.Y.Z
 git push origin master --tags
 ```
 
-This push triggers the GitHub Actions workflow which will:
+Pushing the tag triggers the GitHub Actions publish, which will:
 1. Calculate the package version via GitVersion.
 2. Build and run the test suite with code coverage.
 3. Pack the NuGet package (with symbols, `snupkg`).
@@ -108,6 +108,6 @@ git branch -d hotfix/X.Y.Z+1
 ## CI/CD Details
 
 - **Workflow**: `.github/workflows/publish.yml`
-- **Triggers**: All pushes and pull requests (build + test + coverage report). NuGet publish only on push to `master`.
+- **Triggers**: All pushes and pull requests (build + test + coverage report). NuGet publish only when a version tag (e.g. `2.1.0`) is pushed — GitVersion resolves the exact tagged version for the package.
 - **Versioning**: GitVersion with `ContinuousDelivery` mode (`GitVersion.yml`). Versions are derived from tags on `master`, so always tag releases.
 - **NuGet API key**: Stored as the `NUGETKEY` repository secret. If the Publish step fails with `403 (The specified API key is invalid, has expired, ...)`, generate a new key at nuget.org, update the secret, and re-run the failed workflow run (`gh run rerun <run-id>`).

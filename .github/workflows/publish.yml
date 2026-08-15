@@ -96,7 +96,9 @@ jobs:
     - name: Pack
       run: dotnet pack src/Docker.Registry.DotNet -c Release -p:PackageVersion=${{ steps.gitversion.outputs.semVer }} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg -o ${{ github.workspace }}/artifacts
 
+    # Publish only on release tag pushes (e.g. 2.1.0) -- a plain push to master
+    # must not publish, since GitVersion would mint a new post-tag version.
     - name: Publish
-      if: github.event_name != 'pull_request' && (github.ref_name == 'master')
+      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
       run: |
         dotnet nuget push '${{ github.workspace }}/artifacts/*.nupkg' --source 'https://api.nuget.org/v3/index.json' -k ${{ secrets.NUGETKEY }} --skip-duplicate
