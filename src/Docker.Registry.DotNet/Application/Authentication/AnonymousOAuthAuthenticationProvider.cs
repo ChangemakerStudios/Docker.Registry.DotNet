@@ -49,12 +49,14 @@ public class AnonymousOAuthAuthenticationProvider : AuthenticationProvider
             bearerBits.Service,
             bearerBits.Scope);
 
-        if (token?.Token == null)
+        var accessToken = token?.Token ?? token?.AccessToken;
+
+        if (accessToken == null)
         {
-            throw new ArgumentNullException(nameof(token.Token), "Authorization token cannot be null");
+            throw new ArgumentNullException(nameof(accessToken), "Authorization token cannot be null");
         }
 
         //Set the header
-        request.Headers.Authorization = new AuthenticationHeaderValue(Schema, token.Token);
+        request.Headers.Authorization = new AuthenticationHeaderValue(Schema, accessToken);
     }
 }
