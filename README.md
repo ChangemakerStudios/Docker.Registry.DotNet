@@ -859,17 +859,16 @@ var catalog = await client.Catalog.GetCatalog();
 
 ## Issue: "Unable to read manifest with provenance enabled image"
 
-**Problem:** Images built with Docker BuildKit's provenance feature (`--provenance true`) may fail to retrieve manifests.
+**Problem:** Images built with Docker BuildKit's provenance feature (`--provenance true`, the default in recent Docker versions) fail to retrieve manifests with a 404 Not Found error.
 
-**Cause:** BuildKit creates manifests with OCI media types that may not be fully supported in older versions.
+**Cause:** BuildKit publishes these images with OCI media types (`application/vnd.oci.image.index.v1+json` and `application/vnd.oci.image.manifest.v1+json`). Versions of Docker.Registry.DotNet without OCI support did not request or recognize these media types ([#28](https://github.com/ChangemakerStudios/Docker.Registry.DotNet/issues/28)).
 
-**Solution:**
-1. Build images with `--provenance false` for compatibility:
-   ```bash
-   docker build --provenance false -t myimage:latest .
-   ```
+**Solution:** Upgrade to a version with OCI manifest support. The OCI image index is returned as a `ManifestList` and OCI image manifests as `ImageManifest2_2`, so code written against the Docker media types works unchanged.
 
-2. Or ensure you're using the latest version of Docker.Registry.DotNet which includes improved OCI support.
+If you are pinned to an older version, build with `--provenance false` as a workaround:
+```bash
+docker build --provenance false -t myimage:latest .
+```
 
 ## Issue: "405 Method Not Allowed" During Authentication
 
