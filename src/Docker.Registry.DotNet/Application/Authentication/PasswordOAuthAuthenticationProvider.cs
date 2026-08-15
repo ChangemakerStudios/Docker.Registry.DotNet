@@ -60,13 +60,16 @@ public class PasswordOAuthAuthenticationProvider(string username, string passwor
             username,
             password);
         
-        if (token?.AccessToken == null)
+        //The OAuth2 grant returns access_token; the classic token endpoint returns token.
+        var accessToken = token?.AccessToken ?? token?.Token;
+
+        if (accessToken == null)
         {
-            throw new ArgumentNullException(nameof(token.AccessToken), "Authorization token cannot be null");
+            throw new ArgumentNullException(nameof(accessToken), "Authorization token cannot be null");
         }
 
         //Set the header
         request.Headers.Authorization =
-            new AuthenticationHeaderValue(Schema, token.AccessToken);
+            new AuthenticationHeaderValue(Schema, accessToken);
     }
 }
