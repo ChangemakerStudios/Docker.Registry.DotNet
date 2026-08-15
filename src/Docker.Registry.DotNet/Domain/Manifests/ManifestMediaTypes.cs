@@ -43,6 +43,22 @@ public static class ManifestMediaTypes
         "application/vnd.docker.distribution.manifest.list.v2+json";
 
     /// <summary>
+    ///     OCI image manifest (structurally equivalent to schema2). Used by buildkit,
+    ///     e.g. when building with provenance/SBOM attestations enabled.
+    /// </summary>
+    public const string OciManifest = "application/vnd.oci.image.manifest.v1+json";
+
+    /// <summary>
+    ///     OCI image index (structurally equivalent to the manifest list).
+    /// </summary>
+    public const string OciIndex = "application/vnd.oci.image.index.v1+json";
+
+    /// <summary>
+    ///     OCI container config JSON
+    /// </summary>
+    public const string OciContainerConfig = "application/vnd.oci.image.config.v1+json";
+
+    /// <summary>
     ///     Container config JSON
     /// </summary>
     public const string ContainerConfig = "application/vnd.docker.container.image.v1+json";
