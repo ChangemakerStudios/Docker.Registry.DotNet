@@ -1,7 +1,5 @@
 ﻿namespace DockerRegistryExplorer.View
 {
-    using System.Windows;
-
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>

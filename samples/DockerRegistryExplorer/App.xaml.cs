@@ -1,10 +1,5 @@
-﻿using System.Windows;
-
-namespace DockerRegistryExplorer
+﻿namespace DockerRegistryExplorer
 {
-    using Autofac;
-    using Cas.Common.WPF.Interfaces;
-    using GalaSoft.MvvmLight.Threading;
     using ViewModel;
 
     /// <summary>
@@ -14,8 +9,6 @@ namespace DockerRegistryExplorer
     {
         private void App_OnStartup(object sender, StartupEventArgs e)
         {
-            DispatcherHelper.Initialize();
-
             using (var container = ContainerFactory.Build())
             {
                 var viewService = container.Resolve<IViewService>();

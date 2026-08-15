@@ -1,89 +1,74 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Input;
+﻿using Docker.Registry.DotNet.Domain.Models;
 
-using Autofac;
+namespace DockerRegistryExplorer.ViewModel;
 
-using Docker.Registry.DotNet.Models;
-using Docker.Registry.DotNet.Registry;
-
-using DockerExplorer.Extensions;
-
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.CommandWpf;
-
-namespace DockerRegistryExplorer.ViewModel
+public class RepositoryViewModel : ObservableObject
 {
-    public class RepositoryViewModel : ViewModelBase
+    private readonly ILifetimeScope _lifetimeScope;
+
+    private readonly IRegistryClient _registryClient;
+
+    private TagViewModel[] _tags = [];
+
+    public RepositoryViewModel(
+        string name,
+        RegistryViewModel parent,
+        IRegistryClient registryClient,
+        ILifetimeScope lifetimeScope)
     {
-        private readonly ILifetimeScope _lifetimeScope;
+        Parent = parent ?? throw new ArgumentNullException(nameof(parent));
+        _registryClient = registryClient ?? throw new ArgumentNullException(nameof(registryClient));
+        _lifetimeScope = lifetimeScope ?? throw new ArgumentNullException(nameof(lifetimeScope));
+        Name = name;
 
-        private readonly IRegistryClient _registryClient;
+        Refresh();
 
-        private TagViewModel[] _tags;
+        RefreshCommand = new RelayCommand(Refresh);
+    }
 
-        public RepositoryViewModel(
-            string name,
-            RegistryViewModel parent,
-            IRegistryClient registryClient,
-            ILifetimeScope lifetimeScope)
+    public ICommand RefreshCommand { get; }
+
+    public TagViewModel[] Tags
+    {
+        get => _tags;
+        private set
         {
-            this.Parent = parent ?? throw new ArgumentNullException(nameof(parent));
-            this._registryClient = registryClient ?? throw new ArgumentNullException(nameof(registryClient));
-            this._lifetimeScope = lifetimeScope ?? throw new ArgumentNullException(nameof(lifetimeScope));
-            this.Name = name;
-
-            this.Refresh();
-
-            this.RefreshCommand = new RelayCommand(this.Refresh);
+            _tags = value;
+            OnPropertyChanged();
         }
+    }
 
-        public ICommand RefreshCommand { get; }
+    public string Name { get; }
 
-        public TagViewModel[] Tags
-        {
-            get => this._tags;
-            private set
-            {
-                this._tags = value;
-                this.RaisePropertyChanged();
-            }
-        }
+    public AsyncExecutor Executor { get; } = new();
 
-        public string Name { get; }
+    public RegistryViewModel Parent { get; }
 
-        public AsyncExecutor Executor { get; } = new AsyncExecutor();
+    public void Refresh()
+    {
+        if (!CanRefresh()) return;
 
-        public RegistryViewModel Parent { get; }
+        Executor.ExecuteAsync(ListImagesTags).IgnoreAsync();
+    }
 
-        public void Refresh()
-        {
-            if (!this.CanRefresh()) return;
+    private async Task ListImagesTags()
+    {
+        var tags = await _registryClient.Tags.ListTags(
+            Name,
+            new ListTagsParameters());
 
-            this.Executor.ExecuteAsync(this.ListImagesTags).IgnoreAsync();
-        }
+        if (tags.Tags == null) Tags = [];
+        else
+            Tags = tags.Tags.Select(t => _lifetimeScope.Resolve<TagViewModel>(
+                    new NamedParameter("repository", Name),
+                    new NamedParameter("tag", t.Value),
+                    new TypedParameter(GetType(), this)))
+                .OrderByDescending(t => t.Tag)
+                .ToArray();
+    }
 
-        private async Task ListImagesTags()
-        {
-            var tags = await this._registryClient.Tags.ListTags(
-                this.Name,
-                new ListTagsParameters());
-
-            if (tags.Tags == null) this.Tags = new TagViewModel[] { };
-            else
-                this.Tags = tags.Tags.Select(
-                        t => this._lifetimeScope.Resolve<TagViewModel>(
-                            new NamedParameter("repository", this.Name),
-                            new NamedParameter("tag", t),
-                            new TypedParameter(this.GetType(), this)))
-                    .OrderByDescending(t => t.Tag)
-                    .ToArray();
-        }
-
-        private bool CanRefresh()
-        {
-            return !this.Executor.IsBusy;
-        }
+    private bool CanRefresh()
+    {
+        return !Executor.IsBusy;
     }
 }

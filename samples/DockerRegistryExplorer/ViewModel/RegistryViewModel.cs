@@ -1,42 +1,28 @@
-﻿namespace DockerRegistryExplorer.ViewModel
+﻿namespace DockerRegistryExplorer.ViewModel;
+
+public class RegistryViewModel : ObservableObject
 {
-    using System;
-    using System.Linq;
-    using System.Windows.Input;
-    using Autofac;
-    using GalaSoft.MvvmLight;
-    using GalaSoft.MvvmLight.CommandWpf;
-
-    public class RegistryViewModel : ViewModelBase
+    public RegistryViewModel(string url, ILifetimeScope lifetimeScope)
     {
-        private readonly ILifetimeScope _lifetimeScope;
+        Url = url;
 
-        public RegistryViewModel(string url, ILifetimeScope lifetimeScope)
-        {
-            _lifetimeScope = lifetimeScope ?? throw new ArgumentNullException(nameof(lifetimeScope));
-            Url = url;
+        Children =
+        [
+            lifetimeScope.Resolve<RepositoriesViewModel>(
+                new TypedParameter(GetType(), this))
+        ];
 
-            Children = new ViewModelBase[]
-            {
-                lifetimeScope.Resolve<RepositoriesViewModel>(
-                    new TypedParameter(GetType(), this))
-            };
+        RefreshCommand = new RelayCommand(Refresh);
+    }
 
-            RefreshCommand = new RelayCommand(Refresh);
-        }
+    public ICommand RefreshCommand { get; }
 
-        public ICommand RefreshCommand { get; }
+    public string Url { get; }
 
-        public void Refresh()
-        {
-            foreach (var child in Children.OfType<RepositoryViewModel>())
-            {
-                child.Refresh();
-            }
-        }
+    public ObservableObject[] Children { get; }
 
-        public string Url { get; }
-
-        public ViewModelBase[] Children { get; }
+    public void Refresh()
+    {
+        foreach (var child in Children.OfType<RepositoriesViewModel>()) child.Refresh();
     }
 }

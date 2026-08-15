@@ -1,17 +1,14 @@
-﻿namespace DockerRegistryExplorer.ViewModel
+﻿namespace DockerRegistryExplorer.ViewModel;
+
+public class TextDialogViewModel : ObservableObject
 {
-    using GalaSoft.MvvmLight;
-
-    public class TextDialogViewModel : ViewModelBase
+    public TextDialogViewModel(string text, string title = "Text")
     {
-        public TextDialogViewModel(string text, string title = "Text")
-        {
-            Text = text;
-            Title = title;
-        }
-
-        public string Text { get; }
-
-        public string Title { get; }
+        Text = text;
+        Title = title;
     }
+
+    public string Text { get; }
+
+    public string Title { get; }
 }
