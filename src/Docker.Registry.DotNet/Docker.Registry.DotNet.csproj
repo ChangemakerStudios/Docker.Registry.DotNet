@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;net5.0;net6.0;net7.0;net8.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;net6.0;net7.0;net8.0</TargetFrameworks>
 		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
 		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
@@ -9,7 +9,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<Version>2.0.0</Version>
+		<Version>2.1.0</Version>
 		<PackageId>Docker.Registry.DotNet</PackageId>
 		<Authors>Rich Quackenbush, Jaben Cargman and the Docker.Registry.DotNet Contributors</Authors>
 		<Copyright>Copyright © Rich Quackenbush, Jaben Cargman and the Docker.Registry.DotNet Contributors 2017-2022</Copyright>
@@ -18,15 +18,9 @@
 		<PackageProjectUrl>https://github.com/ChangemakerStudios/Docker.Registry.DotNet</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/ChangemakerStudios/Docker.Registry.DotNet</RepositoryUrl>
 		<PackageReleaseNotes>
-			* Added direct .NET 5/6/7/8 support.
-			* Switched to more DDD style configuration with a builder.
-			* Removed "Async" from the function names. But, added Legacy helpers with [Obsolete] attributes.
-			* Simplified Authentication with configuraiton builders.
-			* Added Docker Hub "registry" support.
-			* Added ITagOperation.ListTagsByDigests() that provided all tags for a specific image.
-			* More .NET Core style codebase (still can't directly inject HttpClient, though).
-			* Added ActivitySource support.
-			* Bug fixes/error handling improvements.
+			* Added OCI image manifest and index support -- fixes reading images built with BuildKit provenance/SBOM attestations (#28).
+			* GetDigest now uses a HEAD request per the registry spec -- fixes tag-to-digest mapping on AWS ECR (#34).
+			* Dropped the .NET 5.0 target (netstandard2.0 still covers .NET 5 consumers).
 		</PackageReleaseNotes>
 		<RepositoryType>git</RepositoryType>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
