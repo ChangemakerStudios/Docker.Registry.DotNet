@@ -26,7 +26,8 @@ internal class ManifestOperations(RegistryClient client) : IManifestOperations
             {
                 "Accept",
                 $"{ManifestMediaTypes.ManifestSchema1}, {ManifestMediaTypes.ManifestSchema2}, {
-                    ManifestMediaTypes.ManifestList}, {ManifestMediaTypes.ManifestSchema1Signed}"
+                    ManifestMediaTypes.ManifestList}, {ManifestMediaTypes.ManifestSchema1Signed}, {
+                        ManifestMediaTypes.OciManifest}, {ManifestMediaTypes.OciIndex}"
             }
         };
 
@@ -60,17 +61,19 @@ internal class ManifestOperations(RegistryClient client) : IManifestOperations
                     DockerContentDigest = response.GetHeader("Docker-Content-Digest"),
                     Etag = response.GetHeader("Etag")
                 },
-            ManifestMediaTypes.ManifestSchema2 => new GetImageManifestResult(
-                contentType,
-                client.JsonSerializer.DeserializeObject<ImageManifest2_2>(response.Body),
-                response.Body)
-            {
-                DockerContentDigest = response.GetHeader("Docker-Content-Digest")
-            },
-            ManifestMediaTypes.ManifestList => new GetImageManifestResult(
-                contentType,
-                client.JsonSerializer.DeserializeObject<ManifestList>(response.Body),
-                response.Body),
+            ManifestMediaTypes.ManifestSchema2 or ManifestMediaTypes.OciManifest => new
+                GetImageManifestResult(
+                    contentType,
+                    client.JsonSerializer.DeserializeObject<ImageManifest2_2>(response.Body),
+                    response.Body)
+                {
+                    DockerContentDigest = response.GetHeader("Docker-Content-Digest")
+                },
+            ManifestMediaTypes.ManifestList or ManifestMediaTypes.OciIndex => new
+                GetImageManifestResult(
+                    contentType,
+                    client.JsonSerializer.DeserializeObject<ManifestList>(response.Body),
+                    response.Body),
             _ => throw new UnknownManifestContentTypeException(
                 $"Unexpected ContentType '{contentType}'.")
         };
@@ -82,11 +85,16 @@ internal class ManifestOperations(RegistryClient client) : IManifestOperations
         ImageManifest manifest,
         CancellationToken token)
     {
+        // prefer the manifest's own media type (e.g. OCI) over the docker defaults
         var manifestMediaType = manifest switch
         {
             ImageManifest2_1 => ManifestMediaTypes.ManifestSchema1,
-            ImageManifest2_2 => ManifestMediaTypes.ManifestSchema2,
-            ManifestList => ManifestMediaTypes.ManifestList,
+            ImageManifest2_2 m => string.IsNullOrEmpty(m.MediaType)
+                ? ManifestMediaTypes.ManifestSchema2
+                : m.MediaType,
+            ManifestList m => string.IsNullOrEmpty(m.MediaType)
+                ? ManifestMediaTypes.ManifestList
+                : m.MediaType,
             _ => null
         };
 
@@ -135,20 +143,34 @@ internal class ManifestOperations(RegistryClient client) : IManifestOperations
         ImageTag tag,
         CancellationToken token = default)
     {
-        var response = await this.MakeManifestRequest(name, tag.ToReference(), token);
+        // the registry spec only guarantees Docker-Content-Digest on a HEAD request --
+        // some registries (e.g. AWS ECR) omit it on GET (#34)
+        var response = await this.MakeManifestRequest(
+            name,
+            tag.ToReference(),
+            token,
+            HttpMethod.Head);
 
         var digestValue = response.GetHeader("Docker-Content-Digest");
 
-        return ImageDigest.TryCreate(digestValue, out var digest) ? digest : null;
+        if (ImageDigest.TryCreate(digestValue, out var digest)) return digest;
+
+        // fall back to GET for registries that don't return the header on HEAD
+        response = await this.MakeManifestRequest(name, tag.ToReference(), token);
+
+        digestValue = response.GetHeader("Docker-Content-Digest");
+
+        return ImageDigest.TryCreate(digestValue, out digest) ? digest : null;
     }
 
     private async Task<RegistryApiResponse<string>> MakeManifestRequest(
         string name,
         ImageReference reference,
-        CancellationToken token)
+        CancellationToken token,
+        HttpMethod? method = null)
     {
         return await client.MakeRequest(
-            HttpMethod.Get,
+            method ?? HttpMethod.Get,
             $"{client.RegistryVersion}/{name}/manifests/{reference}",
             null,
             _manifestHeaders,
