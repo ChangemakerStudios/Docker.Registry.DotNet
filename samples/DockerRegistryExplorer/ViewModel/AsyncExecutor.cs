@@ -1,57 +1,53 @@
-﻿using Serilog;
+using Cas.Common.WPF;
 
-namespace DockerRegistryExplorer.ViewModel
+using Serilog;
+
+namespace DockerRegistryExplorer.ViewModel;
+
+public class AsyncExecutor : ObservableObject
 {
-    using System;
-    using System.Threading.Tasks;
+    private readonly IMessageBoxService _messageBoxService = new MessageBoxService();
 
-    using Cas.Common.WPF;
+    private bool _isBusy;
 
-    public class AsyncExecutor : ObservableObject
+    public bool IsBusy
     {
-        private bool _isBusy;
-
-        private readonly IMessageBoxService _messageBoxService = new MessageBoxService();
-
-        public bool IsBusy
+        get => _isBusy;
+        private set
         {
-            get { return _isBusy; }
-            private set
-            {
-                _isBusy = value;
-                OnPropertyChanged();
-            }
+            _isBusy = value;
+            OnPropertyChanged();
         }
+    }
 
-        public async Task<Exception> ExecuteAsync(Func<Task> action)
+    public async Task<Exception?> ExecuteAsync(Func<Task> action)
+    {
+        try
         {
-            try
-            {
-                IsBusy = true;
+            IsBusy = true;
 
-                await action();
+            await action();
 
-                return null;
-            }
-            catch (Exception ex) when (LogError(ex))
-            {
-                _messageBoxService.Show(ex.Message, "Error");
-
-                return ex;
-            }
-            finally
-            {
-                IsBusy = false;
-
-                CommandManager.InvalidateRequerySuggested();
-            }
+            return null;
         }
-
-        private bool LogError(Exception ex)
+        catch (Exception ex) when (LogError(ex))
         {
-            Log.Error(ex, "Failure Executing Task");
+            _messageBoxService.Show(ex.Message, "Error");
 
-            return true;
+            return ex;
         }
+        finally
+        {
+            IsBusy = false;
+
+            CommandManager.InvalidateRequerySuggested();
+        }
+    }
+
+    private static bool LogError(Exception ex)
+    {
+        Log.Error(ex, "Failure Executing Task");
+
+        return true;
     }
 }

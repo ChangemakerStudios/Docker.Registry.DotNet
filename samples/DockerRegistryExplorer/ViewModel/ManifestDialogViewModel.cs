@@ -19,7 +19,7 @@ public class ManifestDialogViewModel : CloseableViewModelBase
 
     private readonly ILifetimeScope _scope;
 
-    private ManifestLayerViewModel _selectedLayer;
+    private ManifestLayerViewModel? _selectedLayer;
 
     public ManifestDialogViewModel(
         ILifetimeScope scope,
@@ -39,13 +39,13 @@ public class ManifestDialogViewModel : CloseableViewModelBase
         _manifest = manifest ?? throw new ArgumentNullException(nameof(manifest));
         _parent = parent ?? throw new ArgumentNullException(nameof(parent));
 
-        if (manifest.Layers != null)
-            Layers = manifest.Layers
-                .Select(l => scope.Resolve<ManifestLayerViewModel>
-                (
-                    new TypedParameter(typeof(ManifestLayer), l)
-                ))
-                .ToArray();
+        Layers = manifest.Layers?
+                     .Select(l => scope.Resolve<ManifestLayerViewModel>
+                     (
+                         new TypedParameter(typeof(ManifestLayer), l)
+                     ))
+                     .ToArray()
+                 ?? [];
 
         DownloadCommand = new RelayCommand(Download, CanDownload);
     }
@@ -56,7 +56,7 @@ public class ManifestDialogViewModel : CloseableViewModelBase
 
     public string Title => $"{_manifest.MediaType}";
 
-    public ManifestLayerViewModel SelectedLayer
+    public ManifestLayerViewModel? SelectedLayer
     {
         get => _selectedLayer;
         set
@@ -75,7 +75,7 @@ public class ManifestDialogViewModel : CloseableViewModelBase
         if (layer == null)
             return;
 
-        GetBlobResponse response = null;
+        GetBlobResponse? response = null;
 
         var ex = await Executor.ExecuteAsync(async () =>
         {
@@ -84,9 +84,9 @@ public class ManifestDialogViewModel : CloseableViewModelBase
                 layer.Digest);
         });
 
-        if (ex != null)
+        if (ex != null || response == null)
         {
-            _messageBoxService.Show(ex.Message);
+            _messageBoxService.Show(ex?.Message ?? "Failed to download layer");
         }
         else
         {
@@ -94,11 +94,12 @@ public class ManifestDialogViewModel : CloseableViewModelBase
             {
                 var result = _fileDialogService.ShowSaveFileDialog();
 
-                if (result != null)
-                    using (var targetStream = File.Create(result.FileName))
-                    {
-                        await stream.CopyToAsync(targetStream);
-                    }
+                if (result == null) return;
+
+                using (var targetStream = File.Create(result.FileName))
+                {
+                    await stream.CopyToAsync(targetStream);
+                }
             }
 
             _messageBoxService.Show("Layer saved", "Complete");

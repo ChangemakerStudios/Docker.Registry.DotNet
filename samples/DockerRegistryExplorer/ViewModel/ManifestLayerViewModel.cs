@@ -22,9 +22,9 @@ public class ManifestLayerViewModel : ObservableObject
 
     public AsyncExecutor Executor { get; } = new();
 
-    public string MediaType => _model.MediaType;
+    public string MediaType => _model.MediaType ?? string.Empty;
 
     public long Size => _model.Size;
 
-    public string Digest => _model.Digest;
+    public string Digest => _model.Digest ?? string.Empty;
 }

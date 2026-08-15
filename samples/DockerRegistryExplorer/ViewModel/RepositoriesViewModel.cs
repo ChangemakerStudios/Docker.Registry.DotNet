@@ -64,7 +64,8 @@ public class RepositoriesViewModel : ObservableObject
         var catalog =
             await _registryClient.Catalog.GetCatalog(new CatalogParameters());
 
-        var repositories = catalog.Repositories.Select(r => _lifetimeScope.Resolve<RepositoryViewModel>(
+        var repositories = (catalog.Repositories ?? [])
+            .Select(r => _lifetimeScope.Resolve<RepositoryViewModel>(
                 new NamedParameter("name", r),
                 new TypedParameter(typeof(RegistryViewModel), _parent)))
             .OrderBy(e => e.Name)
@@ -84,7 +85,7 @@ public class RepositoriesViewModel : ObservableObject
 
     private Task LoadRepositoryInternal()
     {
-        string name = null;
+        string? name = null;
 
         _textEditService.EditText(
             "",
@@ -105,6 +106,7 @@ public class RepositoriesViewModel : ObservableObject
 
     public void Refresh()
     {
+        foreach (var repository in Repositories) repository.Refresh();
     }
 
     private bool CanRefresh()

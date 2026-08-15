@@ -8,7 +8,7 @@ public class RepositoryViewModel : ObservableObject
 
     private readonly IRegistryClient _registryClient;
 
-    private TagViewModel[] _tags;
+    private TagViewModel[] _tags = [];
 
     public RepositoryViewModel(
         string name,

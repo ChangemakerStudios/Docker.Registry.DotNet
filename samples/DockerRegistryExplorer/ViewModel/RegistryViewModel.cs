@@ -23,6 +23,6 @@ public class RegistryViewModel : ObservableObject
 
     public void Refresh()
     {
-        foreach (var child in Children.OfType<RepositoryViewModel>()) child.Refresh();
+        foreach (var child in Children.OfType<RepositoriesViewModel>()) child.Refresh();
     }
 }

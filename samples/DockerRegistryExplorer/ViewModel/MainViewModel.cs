@@ -2,17 +2,19 @@
 
 namespace DockerRegistryExplorer.ViewModel;
 
-public class MainViewModel : ObservableObject
+public class MainViewModel : ObservableObject, IDisposable
 {
     private readonly ILifetimeScope _lifetimeScope;
 
     private readonly ObservableCollection<RegistryViewModel> _registries = new();
 
+    private readonly List<ILifetimeScope> _registryScopes = new();
+
     private readonly IViewService _viewService;
 
     public MainViewModel(ILifetimeScope lifetimeScope, IViewService viewService)
     {
-        _lifetimeScope = lifetimeScope;
+        _lifetimeScope = lifetimeScope ?? throw new ArgumentNullException(nameof(lifetimeScope));
         _viewService = viewService ?? throw new ArgumentNullException(nameof(viewService));
 
         RefreshCommand = new RelayCommand(Refresh);
@@ -35,6 +37,8 @@ public class MainViewModel : ObservableObject
         {
             var registryClient = viewModel.RegistryClient;
 
+            if (registryClient == null) return;
+
             var childScope = _lifetimeScope.BeginLifetimeScope(builder =>
             {
                 builder.RegisterInstance(registryClient);
@@ -45,6 +49,7 @@ public class MainViewModel : ObservableObject
                 new NamedParameter("url", viewModel.Endpoint)
             );
 
+            _registryScopes.Add(childScope);
             _registries.Add(registry);
         }
     }
@@ -52,5 +57,15 @@ public class MainViewModel : ObservableObject
     private void Refresh()
     {
         foreach (var registry in Registries) registry.Refresh();
+    }
+
+    public void Dispose()
+    {
+        // child scopes are not disposed automatically by their parent --
+        // Autofac disposes this view model with the root container on exit
+        foreach (var scope in _registryScopes) scope.Dispose();
+
+        _registryScopes.Clear();
+        _registries.Clear();
     }
 }

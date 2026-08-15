@@ -75,7 +75,7 @@ public class TagViewModel : ObservableObject
                 MessageBoxButton.YesNo) ==
             MessageBoxResult.Yes)
         {
-            var ex = await Executor.ExecuteAsync(GetManifestInternal);
+            var ex = await Executor.ExecuteAsync(DeleteManifestInternal);
 
             if (ex == null)
                 //Refresh
@@ -83,7 +83,7 @@ public class TagViewModel : ObservableObject
         }
     }
 
-    private async Task GetManifestInternal()
+    private async Task DeleteManifestInternal()
     {
         //We need to get the digest of the manifest
         var manifest = await _registryClient.Manifest.GetManifest(
@@ -107,7 +107,7 @@ public class TagViewModel : ObservableObject
 
     private async void GetManifest()
     {
-        GetImageManifestResult result = null;
+        GetImageManifestResult? result = null;
 
         var ex = await Executor.ExecuteAsync(async () =>
         {
@@ -116,9 +116,9 @@ public class TagViewModel : ObservableObject
                 ImageReference.Create(Tag));
         });
 
-        if (ex != null)
+        if (ex != null || result == null)
         {
-            _messageBoxService.Show(ex.Message, "Get manifest");
+            _messageBoxService.Show(ex?.Message ?? "Failed to get manifest", "Get manifest");
         }
         else
         {
@@ -126,7 +126,7 @@ public class TagViewModel : ObservableObject
                 new NamedParameter("text", result.Content),
                 new NamedParameter(
                     "title",
-                    $"Manfiest - {Repository}:{Tag}:{result.MediaType}")
+                    $"Manifest - {Repository}:{Tag}:{result.MediaType}")
             );
 
             _viewService.Show(textDialogViewModel);
@@ -135,7 +135,7 @@ public class TagViewModel : ObservableObject
 
     private async void ViewManifest()
     {
-        GetImageManifestResult result = null;
+        GetImageManifestResult? result = null;
 
         var ex = await Executor.ExecuteAsync(async () =>
         {
@@ -144,9 +144,9 @@ public class TagViewModel : ObservableObject
                 ImageReference.Create(Tag));
         });
 
-        if (ex != null)
+        if (ex != null || result == null)
         {
-            _messageBoxService.Show(ex.Message);
+            _messageBoxService.Show(ex?.Message ?? "Failed to get manifest");
         }
         else
         {

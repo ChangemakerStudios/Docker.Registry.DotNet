@@ -1,88 +1,87 @@
-﻿using System.Threading.Tasks;
-
 using Docker.Registry.DotNet;
 using Docker.Registry.DotNet.Application.Authentication;
 
-namespace DockerRegistryExplorer.ViewModel
+namespace DockerRegistryExplorer.ViewModel;
+
+public class ConnectViewModel : DialogViewModelBase
 {
-    public class ConnectViewModel : DialogViewModelBase
+    private const string DefaultEndpoint = "https://registry-1.docker.io";
+
+    private string _endpoint = DefaultEndpoint;
+
+    private bool _isAnonymous = true;
+
+    private string? _password;
+
+    private string? _username;
+
+    public AsyncExecutor Executor { get; } = new();
+
+    public bool IsAnonymous
     {
-        private const string DefaultEndpoint = "https://registry-1.docker.io";
-
-        private string _endpoint = DefaultEndpoint;
-
-        private bool _isAnonymous = true;
-
-        private string _password;
-
-        private string _username;
-
-        public AsyncExecutor Executor { get; } = new AsyncExecutor();
-
-        public bool IsAnonymous
+        get => _isAnonymous;
+        set
         {
-            get => this._isAnonymous;
-            set
-            {
-                this._isAnonymous = value;
-                this.OnPropertyChanged();
-            }
+            _isAnonymous = value;
+            OnPropertyChanged();
         }
+    }
 
-        public string Endpoint
+    public string Endpoint
+    {
+        get => _endpoint;
+        set
         {
-            get => this._endpoint;
-            set
-            {
-                this._endpoint = value;
-                this.OnPropertyChanged();
-            }
+            _endpoint = value;
+            OnPropertyChanged();
         }
+    }
 
-        public string Username
+    public string? Username
+    {
+        get => _username;
+        set
         {
-            get => this._username;
-            set
-            {
-                this._username = value;
-                this.OnPropertyChanged();
-            }
+            _username = value;
+            OnPropertyChanged();
         }
+    }
 
-        public string Password
+    public string? Password
+    {
+        get => _password;
+        set
         {
-            get => this._password;
-            set
-            {
-                this._password = value;
-                this.OnPropertyChanged();
-            }
+            _password = value;
+            OnPropertyChanged();
         }
+    }
 
-        /// <summary>
-        ///     If Ok is pressed, this will have the registry client
-        /// </summary>
-        public IRegistryClient RegistryClient { get; private set; }
+    /// <summary>
+    ///     If Ok is pressed, this will have the registry client
+    /// </summary>
+    public IRegistryClient? RegistryClient { get; private set; }
 
-        protected override async void Ok()
-        {
-            var ex = await this.Executor.ExecuteAsync(this.Connect);
+    protected override async void Ok()
+    {
+        var ex = await Executor.ExecuteAsync(Connect);
 
-            if (ex == null) base.Ok();
-        }
+        if (ex == null) base.Ok();
+    }
 
-        private async Task Connect()
-        {
-            var configuration = new RegistryClientConfiguration(this.Endpoint);
+    private async Task Connect()
+    {
+        var configuration = new RegistryClientConfiguration(Endpoint);
 
-            if (!this.IsAnonymous && this.Username != null && this.Password != null)
-                configuration.UsePasswordOAuthAuthentication(this.Username, this.Password);
+        if (!IsAnonymous
+            && !string.IsNullOrWhiteSpace(Username)
+            && !string.IsNullOrWhiteSpace(Password))
+            configuration.UsePasswordOAuthAuthentication(Username, Password);
 
-            var client = configuration.CreateClient();
+        var client = configuration.CreateClient();
 
-            await client.System.Ping();
+        await client.System.Ping();
 
-            this.RegistryClient = client;
-        }
+        RegistryClient = client;
     }
 }
