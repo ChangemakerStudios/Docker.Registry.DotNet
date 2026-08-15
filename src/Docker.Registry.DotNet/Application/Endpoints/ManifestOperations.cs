@@ -135,20 +135,34 @@ internal class ManifestOperations(RegistryClient client) : IManifestOperations
         ImageTag tag,
         CancellationToken token = default)
     {
-        var response = await this.MakeManifestRequest(name, tag.ToReference(), token);
+        // the registry spec only guarantees Docker-Content-Digest on a HEAD request --
+        // some registries (e.g. AWS ECR) omit it on GET (#34)
+        var response = await this.MakeManifestRequest(
+            name,
+            tag.ToReference(),
+            token,
+            HttpMethod.Head);
 
         var digestValue = response.GetHeader("Docker-Content-Digest");
 
-        return ImageDigest.TryCreate(digestValue, out var digest) ? digest : null;
+        if (ImageDigest.TryCreate(digestValue, out var digest)) return digest;
+
+        // fall back to GET for registries that don't return the header on HEAD
+        response = await this.MakeManifestRequest(name, tag.ToReference(), token);
+
+        digestValue = response.GetHeader("Docker-Content-Digest");
+
+        return ImageDigest.TryCreate(digestValue, out digest) ? digest : null;
     }
 
     private async Task<RegistryApiResponse<string>> MakeManifestRequest(
         string name,
         ImageReference reference,
-        CancellationToken token)
+        CancellationToken token,
+        HttpMethod? method = null)
     {
         return await client.MakeRequest(
-            HttpMethod.Get,
+            method ?? HttpMethod.Get,
             $"{client.RegistryVersion}/{name}/manifests/{reference}",
             null,
             _manifestHeaders,
